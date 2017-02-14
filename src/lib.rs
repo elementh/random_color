@@ -1,5 +1,5 @@
 mod pick;
-
+mod color_dictionary;
 
 pub enum RandomColor {
     HSV([u32; 3]),
