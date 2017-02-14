@@ -2,7 +2,7 @@ mod pick;
 mod color_dictionary;
 
 pub enum RandomColor {
-    HSV([u32; 3]),
+    HSV([i32; 3]),
 }
 impl RandomColor {
     pub fn new() -> RandomColor{
