@@ -9,3 +9,4 @@ homepage ="https://github.com/elementh/RandomColor"
 description = ":gear: :art: Rust package for generating random attractive colors"
 
 [dependencies]
+rand = "0.3.15"
