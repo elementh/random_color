@@ -5,8 +5,7 @@ use pick::rand::Rng;
 // use color_dictionary::ColorDictionary;
 
 pub fn hue() -> u32 {
-    let hue = rand::thread_rng().gen_range(0, 361);
-    (hue)
+    hue = rand::thread_rng().gen_range(0, 361);
 }
 
 pub fn saturation(hue: &u32) -> u32 {
