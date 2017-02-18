@@ -26,7 +26,15 @@ impl Color {
             value_range: value_range,
         }
     }
+    pub fn has_between_range(&self, hue: &i32) -> bool {
+        if hue >= &self.range[0] && hue <= &self.range[1] {
+            (true)
+        } else {
+            (false)
+        }
+    }
 }
+
 pub struct ColorDictionary {
     monochrome: Color,
     red: Color,
@@ -40,7 +48,9 @@ pub struct ColorDictionary {
 impl ColorDictionary {
     pub fn new() -> ColorDictionary {
         ColorDictionary {
-            monochrome: Color::new([0, 0], vec![[0,0], [100,0]]),
+            monochrome: Color::new(
+                [0, 0], 
+                vec![[0,0], [100,0]]),
             red: Color::new(
                 [-26,18], vec![[20,100],[30,92],[40,89],[50,85],[60,78],[70,70],[80,60],[90,55],[100,50]]),
             orange: Color::new(
@@ -63,12 +73,28 @@ impl ColorDictionary {
                 vec![[20,100],[30,90],[40,86],[60,84],[80,80],[90,75],[100,73]]),
         }
     }
-    fn get_color(&self, hue: &i32) -> &Color {
-        let min = &334; // I don't understand this
-        let max = &360;
-        if hue >= min && hue <= max {
-            let hue = hue - 360;
-        }
-        &self.monochrome
+    pub fn get_saturation_range(&self, hue: &i32) -> (&i32, &i32){
+        let color = self.get_color(hue);
+        (&color.saturation_range[0], &color.saturation_range[1])
+    }
+    pub fn get_color(&self, hue: &i32) -> &Color {
+        if self.monochrome.has_between_range(&hue) {
+            &self.monochrome
+        } else if self.red.has_between_range(&hue) {
+            &self.red
+        } else if self.orange.has_between_range(&hue) {
+            &self.orange
+        } else if self.yellow.has_between_range(&hue) {
+            &self.yellow
+        } else if self.green.has_between_range(&hue) {
+            &self.green
+        } else if self.blue.has_between_range(&hue) {
+            &self.blue
+        } else if self.purple.has_between_range(&hue) {
+            &self.purple
+        // } else if self.pink.has_between_range(&hue) {
+        } else {
+            &self.pink
+        }   
     }
 }
