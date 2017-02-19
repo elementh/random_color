@@ -1,6 +1,7 @@
 mod pick;
 mod color_dictionary;
 
+#[derive(Debug)]
 pub enum RandomColor {
     HSV([i32; 3]),
 }
@@ -13,6 +14,7 @@ impl RandomColor {
         let value = pick::value(&hue, &saturation);
         
         let hsv = [hue, saturation, value];
+        
         RandomColor::HSV(hsv)
     }
 }

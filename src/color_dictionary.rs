@@ -1,4 +1,4 @@
-struct Color {
+pub struct Color {
     range: [i32;2],
     lower_bounds: Vec<[i32;2]>,
     saturation_range: [i32;2],
@@ -73,28 +73,51 @@ impl ColorDictionary {
                 vec![[20,100],[30,90],[40,86],[60,84],[80,80],[90,75],[100,73]]),
         }
     }
-    pub fn get_saturation_range(&self, hue: &i32) -> (&i32, &i32){
+    
+    pub fn get_saturation_range(self, hue: &i32) -> (i32, i32){
         let color = self.get_color(hue);
-        (&color.saturation_range[0], &color.saturation_range[1])
+        (color.saturation_range[0], color.saturation_range[1])
     }
-    pub fn get_color(&self, hue: &i32) -> &Color {
+    
+    pub fn get_minimum_value(self, hue: &i32, saturation: &i32) -> i32{
+        let mut minimum_value = 0;
+        let lower_bounds = self.get_color(hue).lower_bounds;
+        for i in 0..lower_bounds.len()-1 {
+            let s1 = lower_bounds[i][0];
+            let v1 = lower_bounds[i][1];
+            
+            let s2 = lower_bounds[i+1][0];
+            let v2 = lower_bounds[i+1][1];
+            
+            if saturation >= &s1 && saturation <= &s2 {
+                let m = (v2 - v1)/(s2 - s1);
+                let b = v1 - m*s1;
+                
+                minimum_value = m*saturation + b;
+            }
+        }
+        
+        (minimum_value)
+    }
+    
+    pub fn get_color(self, hue: &i32) -> Color {
         if self.monochrome.has_between_range(&hue) {
-            &self.monochrome
+            self.monochrome
         } else if self.red.has_between_range(&hue) {
-            &self.red
+            self.red
         } else if self.orange.has_between_range(&hue) {
-            &self.orange
+            self.orange
         } else if self.yellow.has_between_range(&hue) {
-            &self.yellow
+            self.yellow
         } else if self.green.has_between_range(&hue) {
-            &self.green
+            self.green
         } else if self.blue.has_between_range(&hue) {
-            &self.blue
+            self.blue
         } else if self.purple.has_between_range(&hue) {
-            &self.purple
+            self.purple
         // } else if self.pink.has_between_range(&hue) {
         } else {
-            &self.pink
+            self.pink
         }   
     }
 }
