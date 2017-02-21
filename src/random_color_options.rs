@@ -1,8 +1,15 @@
+pub struct RandomColorOptions {
+    pub hue: Option<Color>,
+    pub luminosity: Option<&'static str>,
+    pub seed: Option<i32>,
+    pub alpha: Option<f32>,
+}
+
 pub struct Color {
-    range: [i32;2],
-    lower_bounds: Vec<[i32;2]>,
-    saturation_range: [i32;2],
-    value_range: [i32;2],
+    pub range: [i32;2],
+    pub lower_bounds: Vec<[i32;2]>,
+    pub saturation_range: [i32;2],
+    pub value_range: [i32;2],
 }
 impl Color {
     pub fn new(range: [i32;2], lower_bounds: Vec<[i32;2]>) -> Color {
@@ -36,14 +43,14 @@ impl Color {
 }
 
 pub struct ColorDictionary {
-    monochrome: Color,
-    red: Color,
-    orange: Color,
-    yellow: Color,
-    green: Color,
-    blue: Color,
-    purple: Color,
-    pink: Color,
+    pub monochrome: Color,
+    pub red: Color,
+    pub orange: Color,
+    pub yellow: Color,
+    pub green: Color,
+    pub blue: Color,
+    pub purple: Color,
+    pub pink: Color,
 }
 impl ColorDictionary {
     pub fn new() -> ColorDictionary {
