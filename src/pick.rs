@@ -20,7 +20,6 @@ pub fn saturation(options: &RandomColorOptions, hue: &i32) -> i32 {
     // let mut s_max = s_range.1;
     let s_min = s_range.0;
     let s_max = s_range.1;
-    
     match options.luminosity {
         None => random_within(options, s_min, s_max),
         Some("random") => random_within(options, 0, 100),
