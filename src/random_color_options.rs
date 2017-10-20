@@ -11,6 +11,7 @@ pub struct Color {
     pub saturation_range: [i32;2],
     pub value_range: [i32;2],
 }
+
 impl Color {
     pub fn new(range: [i32;2], lower_bounds: Vec<[i32;2]>) -> Color {
         

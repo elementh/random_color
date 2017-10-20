@@ -1,11 +1,11 @@
 [package]
-name = "RandomColor"
+name = "random_color"
 version = "0.1.0"
 authors = ["Lucas Maximiliano Marino <lucasmmarino@icloud.com>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/elementh/RandomColor.git"
-homepage ="https://github.com/elementh/RandomColor"
+repository = "https://github.com/elementh/random_color.git"
+homepage ="https://github.com/elementh/random_color"
 description = ":gear: :art: Rust package for generating random attractive colors"
 
 [dependencies]

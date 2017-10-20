@@ -1,4 +1,4 @@
-# RandomColor
+# random_color
 :gear: :art: Rust package for generating random attractive colors 
 
 ## License
