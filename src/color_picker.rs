@@ -1,10 +1,3 @@
-pub struct RandomColorOptions {
-    pub hue: Option<Color>,
-    pub luminosity: Option<&'static str>,
-    pub seed: Option<i32>,
-    pub alpha: Option<f32>,
-}
-
 pub struct Color {
     pub range: [i32;2],
     pub lower_bounds: Vec<[i32;2]>,
