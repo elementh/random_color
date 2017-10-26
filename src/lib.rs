@@ -9,7 +9,6 @@ use color_dictionary::{ColorDictionary, Color};
 pub struct RandomColor {
     pub hue: Option<Color>,
     pub luminosity: Option<&'static str>,
-    // pub count: Option<u32>,
     pub seed: Option<i32>,
     pub alpha: Option<f32>,
 }
@@ -18,7 +17,6 @@ impl RandomColor {
         RandomColor {
             hue: None,
             luminosity: None,
-            // count: None,
             seed: None,
             alpha: Some(1.0),
         }
@@ -48,10 +46,6 @@ impl RandomColor {
         }
         self
     }
-    // pub fn count(&mut self, count: u32) -> &mut RandomColor {
-    //     self.count = Some(count);
-    //     self
-    // }
     pub fn seed(&mut self, seed: i32) -> &mut RandomColor {
         self.seed = Some(seed);
         self
@@ -89,15 +83,23 @@ impl RandomColor {
     }
     pub fn to_hsl(&self) -> String {
         let (h, s, b) = self.generate_color();
-        unimplemented!()
+        let hsv = self.hsv_to_hsl(h, s, b);
+        
+        format!("hsl({}, {}%, {}%)", hsv[0],hsv[1],hsv[2])
     }
     pub fn to_hsla(&self) -> String {
+        let a: f32;        
         let (h, s, b) = self.generate_color();
-        unimplemented!()
+        let hsv = self.hsv_to_hsl(h, s, b);
+        match self.alpha {
+            Some(alpha) => a = alpha,
+            None => a = rand::random(),
+        }
+        format!("hsl({}, {}%, {}%, {})", hsv[0],hsv[1],hsv[2], a)
     }
     pub fn to_hsl_array(&self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
-        unimplemented!()
+        self.hsv_to_hsl(h, s, b)
     }
     pub fn to_hex(&self) -> String {
         let (h, s, b) = self.generate_color();
@@ -128,7 +130,7 @@ impl RandomColor {
             Some("bright") => self.random_within(55, s_max),
             Some("dark") => self.random_within(s_max - 10, s_max),
             Some("light") => self.random_within(s_min, 55),
-            _ => self.random_within(s_min, s_max), // maybe error??
+            _ => self.random_within(s_min, s_max)
         }
     }
     fn pick_brightness(&self, hue: &i32, saturation: &i32) -> i32 {
@@ -142,7 +144,7 @@ impl RandomColor {
             Some("random") => self.random_within(0, 100),
             Some("light") => self.random_within((b_max + b_min) / 2, b_max),
             Some("dark") => self.random_within(b_min, b_min + 20),
-            _ => self.random_within(b_min, b_max),
+            _ => self.random_within(b_min, b_max)
         }
 
     }
@@ -222,6 +224,22 @@ impl RandomColor {
             (r * 255.0).floor() as u32,
             (g * 255.0).floor() as u32,
             (b * 255.0).floor() as u32,
+        ]
+    }
+    fn hsv_to_hsl(&self, hue: i32, saturation: i32, brightness: i32) -> [u32; 3] {
+        let h = hue;
+        let s = saturation as f32 / 100.0;
+        let v = brightness as f32 / 100.0;
+        let mut k = (2.0 - s) * v;
+
+        if k > 1.0 {
+            k = 2.0 - k;
+        }
+
+        [
+            h as u32,
+            ((s * v / k * 10000.0) / 100.0) as u32,
+            (k / 2.0 * 100.0) as u32,
         ]
     }
 }
