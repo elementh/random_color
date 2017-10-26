@@ -6,7 +6,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/elementh/random_color.git"
 homepage ="https://github.com/elementh/random_color"
-description = ":gear: :art: Rust package for generating random attractive colors"
+description = ":gear: :art: Rust crate for generating random attractive colors"
 
 [dependencies]
 rand = "0.3.15"

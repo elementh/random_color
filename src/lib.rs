@@ -89,7 +89,7 @@ impl RandomColor {
     }
     pub fn to_hex(&self) -> String {
         let (h, s, b) = self.generate_color();
-        unimplemented!()
+        format!("#{:x}{:x}{:x}", h, s, b)
     }
     fn generate_color(&self) -> (i32, i32, i32) {
         let h = self.pick_hue();
@@ -205,9 +205,12 @@ impl RandomColor {
                 b = q;
             }
         }
-        
-        [(r * 255.0).floor() as u32,(r * 255.0).floor() as u32,(r * 255.0).floor() as u32]
 
+        [
+            (r * 255.0).floor() as u32,
+            (r * 255.0).floor() as u32,
+            (r * 255.0).floor() as u32,
+        ]
     }
 }
 
