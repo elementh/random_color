@@ -64,16 +64,24 @@ impl RandomColor {
     }
     pub fn to_hsv_array(&self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
-        [h as u32,s as u32,b as u32]
+        [h as u32, s as u32, b as u32]
     }
     pub fn to_rgb(&self) -> String {
         let (h, s, b) = self.generate_color();
-        unimplemented!()
+        let rgb = self.hsv_to_rgb(h, s, b);
+        //'rgb(' + rgb.join(', ') + ')'
+        format!("rgb({}, {}, {})", rgb[0], rgb[1], rgb[2])
     }
     pub fn to_rgba(&self) -> String {
+        let a: f32;
         let (h, s, b) = self.generate_color();
+        let rgb = self.hsv_to_rgb(h, s, b);
+        match self.alpha {
+            Some(alpha) => a = alpha,
+            None => a = rand::random(),
+        }
 
-        String::new()
+        format!("rgba({}, {}, {}, {})", rgb[0], rgb[1], rgb[2], a)
     }
     pub fn to_rgb_array(&self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
@@ -99,7 +107,7 @@ impl RandomColor {
         let h = self.pick_hue();
         let s = self.pick_saturation(&h);
         let b = self.pick_brightness(&h, &s);
-        (23, 23, 23)
+        (h, s, b)
     }
     fn pick_hue(&self) -> i32 {
         match self.hue {
