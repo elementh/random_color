@@ -1,5 +1,12 @@
 # random_color
-:gear: :art: Rust crate for generating random attractive colors 
+:gear: :art: Rust crate for generating random attractive colors.
+
+Inspired by [RandomColor](https://github.com/davidmerfield/randomColor).
+
+Usage: 
+```rust
+  //TODO
+```
 
 ## License
 
