@@ -62,6 +62,10 @@ impl RandomColor {
         }
         self
     }
+    pub fn to_hsv_array(&self) -> [u32; 3] {
+        let (h, s, b) = self.generate_color();
+        [h as u32,s as u32,b as u32]
+    }
     pub fn to_rgb(&self) -> String {
         let (h, s, b) = self.generate_color();
         unimplemented!()
@@ -73,7 +77,7 @@ impl RandomColor {
     }
     pub fn to_rgb_array(&self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
-        unimplemented!()
+        self.hsv_to_rgb(h, s, b)
     }
     pub fn to_hsl(&self) -> String {
         let (h, s, b) = self.generate_color();
@@ -145,7 +149,7 @@ impl RandomColor {
             }
         }
     }
-    fn hsv_to_rgb(mut hue: i32, saturation: i32, brightness: i32) -> [u32; 3] {
+    fn hsv_to_rgb(&self, mut hue: i32, saturation: i32, brightness: i32) -> [u32; 3] {
         let r: f32;
         let g: f32;
         let b: f32;
@@ -208,8 +212,8 @@ impl RandomColor {
 
         [
             (r * 255.0).floor() as u32,
-            (r * 255.0).floor() as u32,
-            (r * 255.0).floor() as u32,
+            (g * 255.0).floor() as u32,
+            (b * 255.0).floor() as u32,
         ]
     }
 }
