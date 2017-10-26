@@ -1,18 +1,16 @@
 extern crate rand;
 
-mod pick;
-mod color_picker;
+mod color_dictionary;
 
 use rand::Rng;
-use color_picker::{ColorDictionary, Color};
+use color_dictionary::{ColorDictionary, Color};
 
 // #[derive(Clone, Copy, Debug)]
 pub struct RandomColor {
     pub hue: Option<Color>,
     pub luminosity: Option<&'static str>,
-    pub count: Option<u32>,
+    // pub count: Option<u32>,
     pub seed: Option<i32>,
-    pub format: Option<&'static str>,
     pub alpha: Option<f32>,
 }
 impl RandomColor {
@@ -20,9 +18,8 @@ impl RandomColor {
         RandomColor {
             hue: None,
             luminosity: None,
-            count: None,
+            // count: None,
             seed: None,
-            format: None,
             alpha: Some(1.0),
         }
     }
@@ -43,6 +40,7 @@ impl RandomColor {
     }
     pub fn luminosity(&mut self, luminosity: &'static str) -> &mut RandomColor {
         match luminosity {
+            "random" => self.luminosity = Some("random"),
             "bright" => self.luminosity = Some("bright"),
             "light" => self.luminosity = Some("light"),
             "dark" => self.luminosity = Some("dark"),
@@ -50,12 +48,19 @@ impl RandomColor {
         }
         self
     }
-    pub fn count(&mut self, count: u32) -> &mut RandomColor {
-        self.count = Some(count);
+    // pub fn count(&mut self, count: u32) -> &mut RandomColor {
+    //     self.count = Some(count);
+    //     self
+    // }
+    pub fn seed(&mut self, seed: i32) -> &mut RandomColor {
+        self.seed = Some(seed);
         self
     }
-    pub fn seed<T>(&mut self, seed: T) {
-        unimplemented!()
+    pub fn alpha(&mut self, alpha: f32) -> &mut RandomColor {
+        if alpha < 1.0 {
+            self.alpha = Some(alpha);
+        }
+        self
     }
     pub fn to_rgb(&self) -> String {
         let (h, s, b) = self.generate_color();
@@ -66,7 +71,7 @@ impl RandomColor {
 
         String::new()
     }
-    pub fn to_rgb_vector(&self) -> Vec<[u32; 3]> {
+    pub fn to_rgb_array(&self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
         unimplemented!()
     }
@@ -78,7 +83,7 @@ impl RandomColor {
         let (h, s, b) = self.generate_color();
         unimplemented!()
     }
-    pub fn to_hsl_vector(&self) -> Vec<[u32; 3]> {
+    pub fn to_hsl_array(&self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
         unimplemented!()
     }
@@ -86,8 +91,10 @@ impl RandomColor {
         let (h, s, b) = self.generate_color();
         unimplemented!()
     }
-    fn generate_color(&self) -> (u32, u32, u32) {
+    fn generate_color(&self) -> (i32, i32, i32) {
         let h = self.pick_hue();
+        let s = self.pick_saturation(&h);
+        let b = self.pick_brightness(&h, &s);
         (23, 23, 23)
     }
     fn pick_hue(&self) -> i32 {
@@ -95,6 +102,37 @@ impl RandomColor {
             None => self.random_within(0, 361),
             Some(ref color) => self.random_within(color.range[0], color.range[1]),
         }
+    }
+    fn pick_saturation(&self, hue: &i32) -> i32 {
+        let cd = ColorDictionary::new();
+        let s_range = cd.get_saturation_range(hue);
+
+        let s_min = s_range.0;
+        let s_max = s_range.1;
+
+        match self.luminosity {
+            None => self.random_within(s_min, s_max),
+            Some("random") => self.random_within(0, 100),
+            Some("bright") => self.random_within(55, s_max),
+            Some("dark") => self.random_within(s_max - 10, s_max),
+            Some("light") => self.random_within(s_min, 55),
+            _ => self.random_within(s_min, s_max), // maybe error??
+        }
+    }
+    fn pick_brightness(&self, hue: &i32, saturation: &i32) -> i32 {
+        let cd = ColorDictionary::new();
+
+        let b_min = cd.get_minimum_value(hue, saturation);
+        let b_max = 100;
+
+        match self.luminosity {
+            None => self.random_within(b_min, b_max),
+            Some("random") => self.random_within(0, 100),
+            Some("light") => self.random_within((b_max + b_min) / 2, b_max),
+            Some("dark") => self.random_within(b_min, b_min + 20),
+            _ => self.random_within(b_min, b_max),
+        }
+
     }
     fn random_within(&self, min: i32, max: i32) -> i32 {
         match self.seed {
@@ -107,52 +145,70 @@ impl RandomColor {
             }
         }
     }
-    // pub fn with_hue(&mut options: RandomColor, hue: &'static str) -> RandomColor {
-    //     let cd = ColorDictionary::new();
-    //     match hue {
-    //         "monochrome" => options.hue = Some(cd.monochrome),
-    //         "red" => options.hue = Some(cd.red),
-    //         "orange" => options.hue = Some(cd.orange),
-    //         "yellow" => options.hue = Some(cd.yellow),
-    //         "green" => options.hue = Some(cd.green),
-    //         "blue" => options.hue = Some(cd.blue),
-    //         "purple" => options.hue = Some(cd.purple),
-    //         "pink" => options.hue = Some(cd.pink),
-    //         _ => options.hue = None
-    //     }
-    //     (options)
-    // }
-    // pub fn with_luminosity(mut options: RandomColor,
-    //                        luminosity: &'static str)
-    //                        -> RandomColor {
-    //     options.luminosity = Some(luminosity);
-    //     (options)
-    // }
-    // pub fn with_seed(mut options: RandomColor, seed: i32) -> RandomColor {
-    //     options.seed = Some(seed);
-    //     (options)
-    // }
-    // pub fn with_alpha(mut options: RandomColor, alpha: f32) -> RandomColor {
-    //     options.alpha = Some(alpha);
-    //     (options)
-    // }
-    // pub fn generate(options: RandomColor) -> String {
+    fn hsv_to_rgb(mut hue: i32, saturation: i32, brightness: i32) -> [u32; 3] {
+        let r: f32;
+        let g: f32;
+        let b: f32;
 
-    //     let hue = pick::hue(&options);
+        if hue == 0 {
+            hue = 1;
+        }
+        if hue == 360 {
+            hue = 359;
+        }
 
-    //     let saturation = pick::saturation(&options, &hue);
+        let h: f32 = hue as f32 / 360.0;
+        let s: f32 = saturation as f32 / 100.0;
+        let v: f32 = brightness as f32 / 100.0;
 
-    //     let value = pick::value(&options, &hue, &saturation);
+        let h_i = (h * 6.0).floor();
+        let f = h * 6.0 - h_i;
+        let p = v * (1.0 - s);
+        let q = v * (1.0 - f * s);
+        let t = v * (1.0 - (1.0 - f) * s);
 
-    // }
-    // pub fn to_hsl(randomcolor: RandomColor) -> String{
-    //     let h = randomcolor.h;
-    //     let s = randomcolor.s/100;
-    //     let v = randomcolor.v/100;
-    //     let k = (2 - s) * v;
-    //
-    //     let s = s * v / (k<1 ? k : 2-k) * 10000;
-    // }
+
+        match h_i as i32 {
+            0 => {
+                r = v;
+                g = t;
+                b = p;
+            }
+            1 => {
+                r = q;
+                g = v;
+                b = p;
+            }
+            2 => {
+                r = p;
+                g = v;
+                b = t;
+            }
+            3 => {
+                r = p;
+                g = q;
+                b = v;
+            }
+            4 => {
+                r = t;
+                g = p;
+                b = v;
+            }
+            5 => {
+                r = v;
+                g = p;
+                b = q;
+            }  
+            _ => {
+                r = v;
+                g = p;
+                b = q;
+            }
+        }
+        
+        [(r * 255.0).floor() as u32,(r * 255.0).floor() as u32,(r * 255.0).floor() as u32]
+
+    }
 }
 
 #[cfg(test)]

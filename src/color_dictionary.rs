@@ -12,8 +12,6 @@ impl Color {
         let saturation_range_max = lower_bounds[lower_bounds.len() - 1][0];
         
         let saturation_range = [saturation_range_min, saturation_range_max];
-        // Min = lowerBounds[lowerBounds.length - 1][1],
-        // bMax = lowerBounds[0][1];
         
         let value_range_min = lower_bounds[lower_bounds.len() - 1][1];
         let value_range_max = lower_bounds[0][1];
@@ -116,7 +114,6 @@ impl ColorDictionary {
             self.blue
         } else if self.purple.has_between_range(&hue) {
             self.purple
-        // } else if self.pink.has_between_range(&hue) {
         } else {
             self.pink
         }   
