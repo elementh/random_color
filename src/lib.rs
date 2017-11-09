@@ -5,7 +5,7 @@ mod color_dictionary;
 use rand::Rng;
 use color_dictionary::{ColorDictionary, Color};
 
-// #[derive(Clone, Copy, Debug)]
+#[derive(Debug, PartialEq)]
 pub struct RandomColor {
     pub hue: Option<Color>,
     pub luminosity: Option<&'static str>,
@@ -84,18 +84,18 @@ impl RandomColor {
     pub fn to_hsl(&self) -> String {
         let (h, s, b) = self.generate_color();
         let hsv = self.hsv_to_hsl(h, s, b);
-        
-        format!("hsl({}, {}%, {}%)", hsv[0],hsv[1],hsv[2])
+
+        format!("hsl({}, {}%, {}%)", hsv[0], hsv[1], hsv[2])
     }
     pub fn to_hsla(&self) -> String {
-        let a: f32;        
+        let a: f32;
         let (h, s, b) = self.generate_color();
         let hsv = self.hsv_to_hsl(h, s, b);
         match self.alpha {
             Some(alpha) => a = alpha,
             None => a = rand::random(),
         }
-        format!("hsl({}, {}%, {}%, {})", hsv[0],hsv[1],hsv[2], a)
+        format!("hsl({}, {}%, {}%, {})", hsv[0], hsv[1], hsv[2], a)
     }
     pub fn to_hsl_array(&self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
@@ -130,7 +130,7 @@ impl RandomColor {
             Some("bright") => self.random_within(55, s_max),
             Some("dark") => self.random_within(s_max - 10, s_max),
             Some("light") => self.random_within(s_min, 55),
-            _ => self.random_within(s_min, s_max)
+            _ => self.random_within(s_min, s_max),
         }
     }
     fn pick_brightness(&self, hue: &i32, saturation: &i32) -> i32 {
@@ -144,7 +144,7 @@ impl RandomColor {
             Some("random") => self.random_within(0, 100),
             Some("light") => self.random_within((b_max + b_min) / 2, b_max),
             Some("dark") => self.random_within(b_min, b_min + 20),
-            _ => self.random_within(b_min, b_max)
+            _ => self.random_within(b_min, b_max),
         }
 
     }
@@ -246,6 +246,114 @@ impl RandomColor {
 
 #[cfg(test)]
 mod tests {
+    use RandomColor;
+    use color_dictionary::ColorDictionary;
+
     #[test]
-    fn it_works() {}
+    fn accept_values() {
+        let cd = ColorDictionary::new();
+        let test_case = RandomColor {
+            hue: Some(cd.blue),
+            luminosity: Some("light"),
+            seed: Some(42),
+            alpha: Some(1.0),
+        }.to_hsl();
+
+        let rc = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_hsl();
+
+        assert_eq!(test_case, rc);
+    }
+    #[test]
+    fn generates_color_as_hsv_array() {
+        let test_case = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_hsv_array();
+
+        assert_eq!(test_case, [179, 20, 100]);
+    }
+    #[test]
+    fn generates_color_as_rgb() {
+        let test_case = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_rgb();
+
+        assert_eq!(test_case, "rgb(204, 255, 254)");
+    }
+    #[test]
+    fn generates_color_as_rgba() {
+        let test_case = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_rgba();
+
+        assert_eq!(test_case, "rgba(204, 255, 254, 1)");
+    }
+    #[test]
+    fn generates_color_as_rgb_array() {
+        let test_case = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_rgb_array();
+
+        assert_eq!(test_case, [204, 255, 254]);
+    }
+    #[test]
+    fn generates_color_as_hsl() {
+        let test_case = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_hsl();
+
+        assert_eq!(test_case, "hsl(179, 99%, 10%)");
+    }
+    #[test]
+    fn generates_color_as_hsla() {
+        let test_case = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_hsla();
+
+        assert_eq!(test_case, "hsl(179, 99%, 10%, 1)");
+    }
+    #[test]
+    fn generates_color_as_hsl_array() {
+        let test_case = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_hsl_array();
+
+        assert_eq!(test_case, [179, 99, 10]);
+    }
+    #[test]
+    fn generates_color_as_hex() {
+        let test_case = RandomColor::new()
+            .hue("blue")
+            .luminosity("light")
+            .seed(42)
+            .alpha(1.0)
+            .to_hex();
+
+        assert_eq!(test_case, "#b31464");
+    }
 }
