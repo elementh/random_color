@@ -1,6 +1,6 @@
 [package]
 name = "random_color"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Lucas Maximiliano Marino <lucasmmarino@icloud.com>"]
 license = "MIT"
 readme = "README.md"
