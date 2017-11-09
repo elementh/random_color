@@ -1,0 +1,12 @@
+[package]
+name = "random_color"
+version = "0.4.0"
+authors = ["Lucas Maximiliano Marino <lucasmmarino@icloud.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/elementh/random_color.git"
+homepage ="https://github.com/elementh/random_color"
+description = ":gear: :art: Rust crate for generating random attractive colors"
+
+[dependencies]
+rand = "0.3.15"
