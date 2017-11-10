@@ -46,7 +46,7 @@ Avaible outputs:
 ## Roadmap
 
 + Seed from string
-+ Generators
++ Iteartor
 + Documentation
 
 ## License
