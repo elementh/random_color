@@ -1,3 +1,19 @@
+//! Rust crate for generating random attractive colors.
+//! Inspired by [RandomColor](https://github.com/davidmerfield/randomColor).
+//! ### Usage
+//! ```rust
+//! use random_color::{Color, Luminosity, RandomColor};
+//!
+//! let color = RandomColor::new()
+//!   .hue(Color::Blue) // Optional
+//!   .luminosity(Luminosity::Light) // Optional
+//!   .seed(42) // Optional
+//!   .alpha(1.0) // Optional
+//!   .to_hsl_string(); // 
+//!
+//! // color => "hsl(179, 99%, 10%)"
+//! ```
+
 extern crate rand;
 
 mod color_dictionary;
@@ -25,12 +41,17 @@ pub enum Luminosity {
 
 #[derive(Debug, PartialEq)]
 pub struct RandomColor {
+    /// Can take values of `Color` enum.
     pub hue: Option<ColorInformation>,
+    /// Can take values of `Luminosity` enum.
     pub luminosity: Option<Luminosity>,
+    /// Can take any value of `i32`.
     pub seed: Option<i32>,
+    /// Can take values `f32` from 0 to 1.
     pub alpha: Option<f32>,
 }
 impl RandomColor {
+    /// Generates a new RandomColor
     pub fn new() -> RandomColor {
         RandomColor {
             hue: None,
@@ -39,6 +60,7 @@ impl RandomColor {
             alpha: Some(1.0),
         }
     }
+    /// Sets `RandomColor.hue` colorspace.
     pub fn hue(&mut self, hue: Color) -> &mut RandomColor {
         let cd = ColorDictionary::new();
 
@@ -56,15 +78,18 @@ impl RandomColor {
         self
         
     }
+    /// Sets `RandomColor.luminosity`.
     pub fn luminosity(&mut self, luminosity: Luminosity) -> &mut RandomColor {
         self.luminosity = Some(luminosity);
 
         self
     }
+    /// Sets `RandomColor.seed` used to generate a color.
     pub fn seed(&mut self, seed: i32) -> &mut RandomColor {
         self.seed = Some(seed);
         self
     }
+    /// Sets `RandomColor.aplha`.
     pub fn alpha(&mut self, alpha: f32) -> &mut RandomColor {
         if alpha < 1.0 {
             self.alpha = Some(alpha);
@@ -75,13 +100,13 @@ impl RandomColor {
         let (h, s, b) = self.generate_color();
         [h as u32, s as u32, b as u32]
     }
-    pub fn to_rgb(&self) -> String {
+    pub fn to_rgb_string(&self) -> String {
         let (h, s, b) = self.generate_color();
         let rgb = self.hsv_to_rgb(h, s, b);
         //'rgb(' + rgb.join(', ') + ')'
         format!("rgb({}, {}, {})", rgb[0], rgb[1], rgb[2])
     }
-    pub fn to_rgba(&self) -> String {
+    pub fn to_rgba_string(&self) -> String {
         let a: f32;
         let (h, s, b) = self.generate_color();
         let rgb = self.hsv_to_rgb(h, s, b);
@@ -96,13 +121,13 @@ impl RandomColor {
         let (h, s, b) = self.generate_color();
         self.hsv_to_rgb(h, s, b)
     }
-    pub fn to_hsl(&self) -> String {
+    pub fn to_hsl_string(&self) -> String {
         let (h, s, b) = self.generate_color();
         let hsv = self.hsv_to_hsl(h, s, b);
 
         format!("hsl({}, {}%, {}%)", hsv[0], hsv[1], hsv[2])
     }
-    pub fn to_hsla(&self) -> String {
+    pub fn to_hsla_string(&self) -> String {
         let a: f32;
         let (h, s, b) = self.generate_color();
         let hsv = self.hsv_to_hsl(h, s, b);
@@ -239,14 +264,14 @@ mod tests {
             luminosity: Some(Luminosity::Light),
             seed: Some(42),
             alpha: Some(1.0),
-        }.to_hsl();
+        }.to_hsl_string();
 
         let rc = RandomColor::new()
             .hue(Color::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
-            .to_hsl();
+            .to_hsl_string();
 
         assert_eq!(test_case, rc);
     }
@@ -262,24 +287,24 @@ mod tests {
         assert_eq!(test_case, [179, 20, 100]);
     }
     #[test]
-    fn generates_color_as_rgb() {
+    fn generates_color_as_rgb_string() {
         let test_case = RandomColor::new()
             .hue(Color::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
-            .to_rgb();
+            .to_rgb_string();
 
         assert_eq!(test_case, "rgb(204, 255, 254)");
     }
     #[test]
-    fn generates_color_as_rgba() {
+    fn generates_color_as_rgba_string() {
         let test_case = RandomColor::new()
             .hue(Color::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
-            .to_rgba();
+            .to_rgba_string();
 
         assert_eq!(test_case, "rgba(204, 255, 254, 1)");
     }
@@ -295,24 +320,24 @@ mod tests {
         assert_eq!(test_case, [204, 255, 254]);
     }
     #[test]
-    fn generates_color_as_hsl() {
+    fn generates_color_as_hsl_string() {
         let test_case = RandomColor::new()
             .hue(Color::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
-            .to_hsl();
+            .to_hsl_string();
 
         assert_eq!(test_case, "hsl(179, 99%, 10%)");
     }
     #[test]
-    fn generates_color_as_hsla() {
+    fn generates_color_as_hsla_string() {
         let test_case = RandomColor::new()
             .hue(Color::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
-            .to_hsla();
+            .to_hsla_string();
 
         assert_eq!(test_case, "hsl(179, 99%, 10%, 1)");
     }

@@ -7,12 +7,14 @@ Inspired by [RandomColor](https://github.com/davidmerfield/randomColor).
 
 Example:
 ```rust
+use random_color::{Color, Luminosity, RandomColor};
+
 let color = RandomColor::new()
-  .hue("blue") // Optional
-  .luminosity("light") // Optional
+  .hue(Color::Blue) // Optional
+  .luminosity(Luminosity::Light) // Optional
   .seed(42) // Optional
   .alpha(1.0) // Optional
-  .to_hsl(); // 
+  .to_hsl_string(); // 
 
 // color => "hsl(179, 99%, 10%)"
 ```
@@ -23,19 +25,19 @@ Avaible outputs:
   let color = RandomColor::new().to_hsv_array(); // color => [179, 20, 100]
 
   // As RGB
-  let color = RandomColor::new().to_rgb(); // color => "rgb(204, 255, 254)"
+  let color = RandomColor::new().to_rgb_string(); // color => "rgb(204, 255, 254)"
 
   // As RGBA
-  let color = RandomColor::new().to_rgba(); // color => "rgba(204, 255, 254, 1)"
+  let color = RandomColor::new().to_rgba_string(); // color => "rgba(204, 255, 254, 1)"
 
   // As RGB Array
   let color = RandomColor::new().to_rgb_array(); // color => [204, 255, 254]
 
   // As HSL
-  let color = RandomColor::new().to_hsl(); // color => "hsl(179, 99%, 10%)"
+  let color = RandomColor::new().to_hsl_string(); // color => "hsl(179, 99%, 10%)"
 
   // As HSLA
-  let color = RandomColor::new().to_hsla(); // color => "hsl(179, 99%, 10%, 1)"
+  let color = RandomColor::new().to_hsla_string(); // color => "hsl(179, 99%, 10%, 1)"
 
   // As HSL Array
   let color = RandomColor::new().to_hsl_array(); // color => [179, 99, 10]
