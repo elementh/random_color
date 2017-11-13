@@ -3,12 +3,30 @@ extern crate rand;
 mod color_dictionary;
 
 use rand::Rng;
-use color_dictionary::{ColorDictionary, Color};
+use color_dictionary::{ColorDictionary, ColorInformation};
+
+pub enum Color {
+    Monochrome,
+    Red,
+    Orange,
+    Yellow,
+    Green,
+    Blue,
+    Purple,
+    Pink
+}
+#[derive(Debug, PartialEq)]
+pub enum Luminosity {
+    Random,
+    Bright,
+    Light,
+    Dark
+}
 
 #[derive(Debug, PartialEq)]
 pub struct RandomColor {
-    pub hue: Option<Color>,
-    pub luminosity: Option<&'static str>,
+    pub hue: Option<ColorInformation>,
+    pub luminosity: Option<Luminosity>,
     pub seed: Option<i32>,
     pub alpha: Option<f32>,
 }
@@ -21,29 +39,26 @@ impl RandomColor {
             alpha: Some(1.0),
         }
     }
-    pub fn hue(&mut self, hue: &'static str) -> &mut RandomColor {
+    pub fn hue(&mut self, hue: Color) -> &mut RandomColor {
         let cd = ColorDictionary::new();
-        match hue {
-            "monochrome" => self.hue = Some(cd.monochrome),
-            "red" => self.hue = Some(cd.red),
-            "orange" => self.hue = Some(cd.orange),
-            "yellow" => self.hue = Some(cd.yellow),
-            "green" => self.hue = Some(cd.green),
-            "blue" => self.hue = Some(cd.blue),
-            "purple" => self.hue = Some(cd.purple),
-            "pink" => self.hue = Some(cd.pink),
-            _ => self.hue = None,
-        }
+
+        self.hue = match hue {
+            Color::Monochrome => Some(cd.monochrome),
+            Color::Red => Some(cd.red),
+            Color::Orange => Some(cd.orange),
+            Color::Yellow => Some(cd.yellow),
+            Color::Green => Some(cd.green),
+            Color::Blue => Some(cd.blue),
+            Color::Purple => Some(cd.purple),
+            Color::Pink => Some(cd.pink),
+        };
+
         self
+        
     }
-    pub fn luminosity(&mut self, luminosity: &'static str) -> &mut RandomColor {
-        match luminosity {
-            "random" => self.luminosity = Some("random"),
-            "bright" => self.luminosity = Some("bright"),
-            "light" => self.luminosity = Some("light"),
-            "dark" => self.luminosity = Some("dark"),
-            _ => self.luminosity = None,
-        }
+    pub fn luminosity(&mut self, luminosity: Luminosity) -> &mut RandomColor {
+        self.luminosity = Some(luminosity);
+
         self
     }
     pub fn seed(&mut self, seed: i32) -> &mut RandomColor {
@@ -125,11 +140,10 @@ impl RandomColor {
         let s_max = s_range.1;
 
         match self.luminosity {
-            None => self.random_within(s_min, s_max),
-            Some("random") => self.random_within(0, 100),
-            Some("bright") => self.random_within(55, s_max),
-            Some("dark") => self.random_within(s_max - 10, s_max),
-            Some("light") => self.random_within(s_min, 55),
+            Some(Luminosity::Random) => self.random_within(0, 100),
+            Some(Luminosity::Bright) => self.random_within(55, s_max),
+            Some(Luminosity::Dark) => self.random_within(s_max - 10, s_max),
+            Some(Luminosity::Light) => self.random_within(s_min, 55),
             _ => self.random_within(s_min, s_max),
         }
     }
@@ -140,10 +154,9 @@ impl RandomColor {
         let b_max = 100;
 
         match self.luminosity {
-            None => self.random_within(b_min, b_max),
-            Some("random") => self.random_within(0, 100),
-            Some("light") => self.random_within((b_max + b_min) / 2, b_max),
-            Some("dark") => self.random_within(b_min, b_min + 20),
+            Some(Luminosity::Random) => self.random_within(0, 100),
+            Some(Luminosity::Light) => self.random_within((b_max + b_min) / 2, b_max),
+            Some(Luminosity::Dark) => self.random_within(b_min, b_min + 20),
             _ => self.random_within(b_min, b_max),
         }
 
@@ -160,10 +173,6 @@ impl RandomColor {
         }
     }
     fn hsv_to_rgb(&self, mut hue: i32, saturation: i32, brightness: i32) -> [u32; 3] {
-        let r: f32;
-        let g: f32;
-        let b: f32;
-
         if hue == 0 {
             hue = 1;
         }
@@ -181,44 +190,14 @@ impl RandomColor {
         let q = v * (1.0 - f * s);
         let t = v * (1.0 - (1.0 - f) * s);
 
-
-        match h_i as i32 {
-            0 => {
-                r = v;
-                g = t;
-                b = p;
-            }
-            1 => {
-                r = q;
-                g = v;
-                b = p;
-            }
-            2 => {
-                r = p;
-                g = v;
-                b = t;
-            }
-            3 => {
-                r = p;
-                g = q;
-                b = v;
-            }
-            4 => {
-                r = t;
-                g = p;
-                b = v;
-            }
-            5 => {
-                r = v;
-                g = p;
-                b = q;
-            }  
-            _ => {
-                r = v;
-                g = p;
-                b = q;
-            }
-        }
+        let (r, g, b) = match h_i as i32 {
+            0 => (v, t, p), 
+            1 => (q, v, p),
+            2 => (p, v, t),
+            3 => (p, q, v),
+            4 => (t, p, v),
+            _ => (v, p, q),
+        };
 
         [
             (r * 255.0).floor() as u32,
@@ -249,19 +228,22 @@ mod tests {
     use RandomColor;
     use color_dictionary::ColorDictionary;
 
+    use Color;
+    use Luminosity;
+
     #[test]
     fn accept_values() {
         let cd = ColorDictionary::new();
         let test_case = RandomColor {
             hue: Some(cd.blue),
-            luminosity: Some("light"),
+            luminosity: Some(Luminosity::Light),
             seed: Some(42),
             alpha: Some(1.0),
         }.to_hsl();
 
         let rc = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_hsl();
@@ -271,8 +253,8 @@ mod tests {
     #[test]
     fn generates_color_as_hsv_array() {
         let test_case = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_hsv_array();
@@ -282,8 +264,8 @@ mod tests {
     #[test]
     fn generates_color_as_rgb() {
         let test_case = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_rgb();
@@ -293,8 +275,8 @@ mod tests {
     #[test]
     fn generates_color_as_rgba() {
         let test_case = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_rgba();
@@ -304,8 +286,8 @@ mod tests {
     #[test]
     fn generates_color_as_rgb_array() {
         let test_case = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_rgb_array();
@@ -315,8 +297,8 @@ mod tests {
     #[test]
     fn generates_color_as_hsl() {
         let test_case = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_hsl();
@@ -326,8 +308,8 @@ mod tests {
     #[test]
     fn generates_color_as_hsla() {
         let test_case = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_hsla();
@@ -337,8 +319,8 @@ mod tests {
     #[test]
     fn generates_color_as_hsl_array() {
         let test_case = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_hsl_array();
@@ -348,8 +330,8 @@ mod tests {
     #[test]
     fn generates_color_as_hex() {
         let test_case = RandomColor::new()
-            .hue("blue")
-            .luminosity("light")
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_hex();
