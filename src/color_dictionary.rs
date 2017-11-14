@@ -1,13 +1,13 @@
 #[derive(Debug, PartialEq)]
-pub struct Color {
+pub struct ColorInformation {
     pub range: [i32; 2],
     pub lower_bounds: Vec<[i32; 2]>,
     pub saturation_range: [i32; 2],
     pub value_range: [i32; 2],
 }
 
-impl Color {
-    pub fn new(range: [i32; 2], lower_bounds: Vec<[i32; 2]>) -> Color {
+impl ColorInformation {
+    pub fn new(range: [i32; 2], lower_bounds: Vec<[i32; 2]>) -> ColorInformation {
 
         let saturation_range_min = lower_bounds[0][0];
         let saturation_range_max = lower_bounds[lower_bounds.len() - 1][0];
@@ -19,7 +19,7 @@ impl Color {
 
         let value_range = [value_range_min, value_range_max];
 
-        Color {
+        ColorInformation {
             range: range,
             lower_bounds: lower_bounds,
             saturation_range: saturation_range,
@@ -27,29 +27,25 @@ impl Color {
         }
     }
     pub fn has_between_range(&self, hue: &i32) -> bool {
-        if hue >= &self.range[0] && hue <= &self.range[1] {
-            (true)
-        } else {
-            (false)
-        }
+        hue >= &self.range[0] && hue <= &self.range[1]
     }
 }
 
 pub struct ColorDictionary {
-    pub monochrome: Color,
-    pub red: Color,
-    pub orange: Color,
-    pub yellow: Color,
-    pub green: Color,
-    pub blue: Color,
-    pub purple: Color,
-    pub pink: Color,
+    pub monochrome: ColorInformation,
+    pub red: ColorInformation,
+    pub orange: ColorInformation,
+    pub yellow: ColorInformation,
+    pub green: ColorInformation,
+    pub blue: ColorInformation,
+    pub purple: ColorInformation,
+    pub pink: ColorInformation,
 }
 impl ColorDictionary {
     pub fn new() -> ColorDictionary {
         ColorDictionary {
-            monochrome: Color::new([0, 0], vec![[0, 0], [100, 0]]),
-            red: Color::new(
+            monochrome: ColorInformation::new([0, 0], vec![[0, 0], [100, 0]]),
+            red: ColorInformation::new(
                 [-26, 18],
                 vec![
                     [20, 100],
@@ -63,7 +59,7 @@ impl ColorDictionary {
                     [100, 50],
                 ],
             ),
-            orange: Color::new(
+            orange: ColorInformation::new(
                 [19, 46],
                 vec![
                     [20, 100],
@@ -75,7 +71,7 @@ impl ColorDictionary {
                     [100, 70],
                 ],
             ),
-            yellow: Color::new(
+            yellow: ColorInformation::new(
                 [47, 62],
                 vec![
                     [25, 100],
@@ -88,7 +84,7 @@ impl ColorDictionary {
                     [100, 75],
                 ],
             ),
-            green: Color::new(
+            green: ColorInformation::new(
                 [63, 178],
                 vec![
                     [30, 100],
@@ -101,7 +97,7 @@ impl ColorDictionary {
                     [100, 40],
                 ],
             ),
-            blue: Color::new(
+            blue: ColorInformation::new(
                 [179, 257],
                 vec![
                     [20, 100],
@@ -115,7 +111,7 @@ impl ColorDictionary {
                     [100, 35],
                 ],
             ),
-            purple: Color::new(
+            purple: ColorInformation::new(
                 [258, 282],
                 vec![
                     [20, 100],
@@ -129,7 +125,7 @@ impl ColorDictionary {
                     [100, 42],
                 ],
             ),
-            pink: Color::new(
+            pink: ColorInformation::new(
                 [283, 334],
                 vec![
                     [20, 100],
@@ -170,7 +166,7 @@ impl ColorDictionary {
         (minimum_value)
     }
 
-    pub fn get_color(self, hue: &i32) -> Color {
+    pub fn get_color(self, hue: &i32) -> ColorInformation {
         if self.monochrome.has_between_range(&hue) {
             self.monochrome
         } else if self.red.has_between_range(&hue) {
