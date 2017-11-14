@@ -5,7 +5,8 @@ Inspired by [RandomColor](https://github.com/davidmerfield/randomColor).
 
 ## Usage 
 
-Example:
+### Example
+
 ```rust
 use random_color::{Color, Luminosity, RandomColor};
 
@@ -19,7 +20,23 @@ let color = RandomColor::new()
 // color => "hsl(179, 99%, 10%)"
 ```
 
-Avaible outputs:
+### Possible hue values: 
+  + `Color::Monochrome`
+  + `Color::Red`
+  + `Color::Orange`
+  + `Color::Yellow`
+  + `Color::Green`
+  + `Color::Blue`
+  + `Color::Purple`
+  + `Color::Pink`
+
+### Possible luminosity values: 
+  + `Luminosity::Random`
+  + `Luminosity::Bright`
+  + `Luminosity::Light`
+  + `Luminosity::Dark`
+
+### Avaible outputs:
 ```rust
   // As HSV Array
   let color = RandomColor::new().to_hsv_array(); // color => [179, 20, 100]
