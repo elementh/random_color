@@ -1,8 +1,9 @@
 # random_color
-:gear: :art: Rust crate for generating random attractive colors.
+:gear: :art: Rust crate for generating random attractive colors. Checck it out on [crates.io](https://crates.io/crates/random_color).
 
 Inspired by [RandomColor](https://github.com/davidmerfield/randomColor).
 
+![crate badge](https://img.shields.io/crates/v/random_color.svg)
 ## Usage 
 
 ### Example
@@ -41,25 +42,25 @@ let color = RandomColor::new()
   // As HSV Array
   let color = RandomColor::new().to_hsv_array(); // color => [179, 20, 100]
 
-  // As RGB
+  // As RGB String
   let color = RandomColor::new().to_rgb_string(); // color => "rgb(204, 255, 254)"
 
-  // As RGBA
+  // As RGBA String
   let color = RandomColor::new().to_rgba_string(); // color => "rgba(204, 255, 254, 1)"
 
   // As RGB Array
   let color = RandomColor::new().to_rgb_array(); // color => [204, 255, 254]
 
-  // As HSL
+  // As HSL String
   let color = RandomColor::new().to_hsl_string(); // color => "hsl(179, 99%, 10%)"
 
-  // As HSLA
+  // As HSLA String
   let color = RandomColor::new().to_hsla_string(); // color => "hsl(179, 99%, 10%, 1)"
 
   // As HSL Array
   let color = RandomColor::new().to_hsl_array(); // color => [179, 99, 10]
   
-  // As Hex
+  // As Hex String
   let color = RandomColor::new().to_hex(); // color => "#b31464"
 ```
 ## Roadmap
