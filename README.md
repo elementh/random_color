@@ -37,6 +37,10 @@ let color = RandomColor::new()
   + `Luminosity::Light`
   + `Luminosity::Dark`
 
+### Possible alpha values:
+  + You can specify a value between 0 and 1 with `.alpha()`
+  + You can specify a random value with `.random_alpha()`
+  
 ### Avaible outputs:
 ```rust
   // As HSV Array

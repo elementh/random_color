@@ -81,7 +81,6 @@ impl RandomColor {
     /// Sets `RandomColor.luminosity`.
     pub fn luminosity(&mut self, luminosity: Luminosity) -> &mut RandomColor {
         self.luminosity = Some(luminosity);
-
         self
     }
     /// Sets `RandomColor.seed` used to generate a color.
@@ -89,11 +88,16 @@ impl RandomColor {
         self.seed = Some(seed);
         self
     }
-    /// Sets `RandomColor.aplha`.
+    /// Sets `RandomColor.aplha` to the value passed if it's lower than *1.0*.
     pub fn alpha(&mut self, alpha: f32) -> &mut RandomColor {
         if alpha < 1.0 {
             self.alpha = Some(alpha);
         }
+        self
+    }
+    /// Sets `RandomColor.alpha` to None, aka random.
+    pub fn random_alpha(&mut self) -> &mut RandomColor {
+        self.alpha = None;
         self
     }
     pub fn to_hsv_array(&self) -> [u32; 3] {
@@ -186,7 +190,10 @@ impl RandomColor {
         }
 
     }
-    fn random_within(&self, min: i32, max: i32) -> i32 {
+    fn random_within(&self, mut min: i32, mut max: i32) -> i32 {
+        if min > max {
+            std::mem::swap(&mut min, &mut max);
+        }
         match self.seed {
             None => rand::thread_rng().gen_range(min, max),
             Some(seed) => {
