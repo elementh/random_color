@@ -194,6 +194,13 @@ impl RandomColor {
         if min > max {
             std::mem::swap(&mut min, &mut max);
         }
+        if min == max {
+            if min != 0 {
+                min -= 1;
+            } else {
+                max += 1;
+            }
+        }
         match self.seed {
             None => rand::thread_rng().gen_range(min, max),
             Some(seed) => {
