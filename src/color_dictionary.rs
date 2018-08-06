@@ -1,13 +1,13 @@
 #[derive(Debug, PartialEq)]
 pub struct ColorInformation {
-    pub range: [i32; 2],
-    pub lower_bounds: Vec<[i32; 2]>,
-    pub saturation_range: [i32; 2],
-    pub value_range: [i32; 2],
+    pub range: [i64; 2],
+    pub lower_bounds: Vec<[i64; 2]>,
+    pub saturation_range: [i64; 2],
+    pub value_range: [i64; 2],
 }
 
 impl ColorInformation {
-    pub fn new(range: [i32; 2], lower_bounds: Vec<[i32; 2]>) -> ColorInformation {
+    pub fn new(range: [i64; 2], lower_bounds: Vec<[i64; 2]>) -> ColorInformation {
 
         let saturation_range_min = lower_bounds[0][0];
         let saturation_range_max = lower_bounds[lower_bounds.len() - 1][0];
@@ -26,7 +26,7 @@ impl ColorInformation {
             value_range: value_range,
         }
     }
-    pub fn has_between_range(&self, hue: &i32) -> bool {
+    pub fn has_between_range(&self, hue: &i64) -> bool {
         hue >= &self.range[0] && hue <= &self.range[1]
     }
 }
@@ -140,12 +140,12 @@ impl ColorDictionary {
         }
     }
 
-    pub fn get_saturation_range(self, hue: &i32) -> (i32, i32) {
+    pub fn get_saturation_range(self, hue: &i64) -> (i64, i64) {
         let color = self.get_color(hue);
         (color.saturation_range[0], color.saturation_range[1])
     }
 
-    pub fn get_minimum_value(self, hue: &i32, saturation: &i32) -> i32 {
+    pub fn get_minimum_value(self, hue: &i64, saturation: &i64) -> i64 {
         let mut minimum_value = 0;
         let lower_bounds = self.get_color(hue).lower_bounds;
         for i in 0..lower_bounds.len() - 1 {
@@ -166,7 +166,7 @@ impl ColorDictionary {
         (minimum_value)
     }
 
-    pub fn get_color(self, hue: &i32) -> ColorInformation {
+    pub fn get_color(self, hue: &i64) -> ColorInformation {
         if self.monochrome.has_between_range(&hue) {
             self.monochrome
         } else if self.red.has_between_range(&hue) {
