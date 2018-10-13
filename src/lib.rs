@@ -159,8 +159,8 @@ impl RandomColor {
     }
     pub fn to_hex(&self) -> String {
         let (h, s, b) = self.generate_color();
-
-        format!("#{:x}{:x}{:x}", h, s, b)
+        let [r, g, b] = self.hsv_to_rgb(h, s, b);
+        format!("#{:02x}{:02x}{:02x}", r, g, b)
     }
 
     fn generate_color(&self) -> (i64, i64, i64) {
@@ -395,6 +395,35 @@ mod tests {
             .alpha(1.0)
             .to_hex();
 
-        assert_eq!(test_case, "#b31464");
+        assert_eq!(test_case, "#ccfffe");
+    }
+
+    #[test]
+    fn to_hex_is_rrggbb() {
+        let test_case = RandomColor::new()
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0)
+            .to_hex();
+        let [r, g, b] = RandomColor::new()
+            .hue(Color::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0)
+            .to_rgb_array();
+
+        assert_eq!(test_case, format!("#{:02x}{:02x}{:02x}", r, g, b).as_str());
+    }
+
+    #[test]
+    fn single_digit_hex_are_padded_by_to_two_chars() {
+        let test_case = RandomColor::new()
+            .luminosity(Luminosity::Dark)
+            .seed(1)
+            .to_hex();
+        
+        println!("test_case: {}", test_case);
+        assert_eq!(test_case, "#000000");
     }
 }
