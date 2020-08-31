@@ -69,7 +69,6 @@ let color = RandomColor::new()
 ```
 ## Roadmap
 
-+ Seed from string
 + Iteartor
 + Documentation
 
