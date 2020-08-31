@@ -10,4 +10,4 @@ homepage ="https://github.com/elementh/random_color"
 description = "Rust crate for generating random attractive colors"
 
 [dependencies]
-rand = "0.3.15"
+rand = { version = "0.7.3", features = ["small_rng"] }
