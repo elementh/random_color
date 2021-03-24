@@ -9,5 +9,8 @@ repository = "https://github.com/elementh/random_color.git"
 homepage ="https://github.com/elementh/random_color"
 description = "Rust crate for generating random attractive colors"
 
+[features]
+wasm-bindgen = ["rand/wasm-bindgen"]
+
 [dependencies]
 rand = { version = "0.7.3", features = ["small_rng"] }
