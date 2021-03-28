@@ -1,4 +1,4 @@
-name: Rust
+name: Publish
 
 on:
   release:
@@ -8,10 +8,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  build-and-publish:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
@@ -21,4 +19,3 @@ jobs:
     - uses: katyo/publish-crates@v1
       with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          dry-run: true
