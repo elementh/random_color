@@ -131,7 +131,7 @@ impl RandomColor {
         format!("rgba({}, {}, {}, {})", rgb[0], rgb[1], rgb[2], a)
     }
 
-    pub fn to_rgb_array(&self) -> [u32; 3] {
+    pub fn to_rgb_array(&self) -> [u8; 3] {
         let (h, s, b) = self.generate_color();
         self.hsv_to_rgb(h, s, b)
     }
@@ -225,7 +225,7 @@ impl RandomColor {
         }
     }
 
-    fn hsv_to_rgb(&self, mut hue: i64, saturation: i64, brightness: i64) -> [u32; 3] {
+    fn hsv_to_rgb(&self, mut hue: i64, saturation: i64, brightness: i64) -> [u8; 3] {
         if hue == 0 {
             hue = 1;
         }
@@ -254,9 +254,9 @@ impl RandomColor {
         };
 
         [
-            (r * 255.0).floor() as u32,
-            (g * 255.0).floor() as u32,
-            (b * 255.0).floor() as u32,
+            (r * 255.0).floor() as u8,
+            (g * 255.0).floor() as u8,
+            (b * 255.0).floor() as u8,
         ]
     }
 
