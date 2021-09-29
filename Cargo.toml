@@ -13,4 +13,4 @@ description = "Rust crate for generating random attractive colors"
 wasm-bindgen = ["rand/wasm-bindgen"]
 
 [dependencies]
-rand = { version = "0.7.3", features = ["small_rng"] }
+rand = { version = "0.8.4", features = ["small_rng"] }
