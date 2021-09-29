@@ -163,7 +163,7 @@ impl ColorDictionary {
             }
         }
 
-        (minimum_value)
+        minimum_value
     }
 
     pub fn get_color(self, hue: &i64) -> ColorInformation {
