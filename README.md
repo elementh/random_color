@@ -1,12 +1,38 @@
 # random_color
-:gear: :art: Rust crate for generating random attractive colors. Checck it out on [crates.io](https://crates.io/crates/random_color).
 
-Inspired by [RandomColor](https://github.com/davidmerfield/randomColor).
+[![crate badge](https://img.shields.io/crates/v/random_color.svg)](https://crates.io/crates/random_color)
 
-![crate badge](https://img.shields.io/crates/v/random_color.svg)
-## Usage 
+Rust crate for generating random attractive colors. Check it out on [crates.io](https://crates.io/crates/random_color).
 
-### Example
+Inspired by [RandomColor](https://github.com/davidmerfield/randomColor) by [davidmerfield](https://github.com/davidmerfield).
+
+## Example projects
+
+Amazing rust projects using `random_color`:
+
+> [cargo-trend](https://github.com/dalance/cargo-trend) —
+> cargo subcommand to generate trend graph of dependent crates
+
+> [light_phylogeny](https://github.com/simonpenel/light_phylogeny) —
+> rust library dedicated to phylogeny
+
+> [Voronoi](https://github.com/HactarCE/Voronoi) —
+> simple program that draws Voronoi cells for a set of points
+
+> [conways-game-of-life](https://github.com/eval-exec/conways-game-of-life) —
+> conways' game of life in rust and with shiny colors
+
+> [graph-sketchpad](https://github.com/dcheatha/graph-sketchpad) —
+> program which allows one to visually create nodes and edges, simply using sdl2
+
+> [CDCS](https://github.com/salmmanfred/CDCS) —
+> helper program for creating Symphony of Empires mods
+
+
+
+## Using the library
+
+Check the online [documentation](https://docs.rs/random_color/latest/random_color/).
 
 ```rust
 use random_color::{Color, Luminosity, RandomColor};
@@ -21,27 +47,31 @@ let color = RandomColor::new()
 // color => "hsl(179, 99%, 10%)"
 ```
 
-### Possible hue values: 
-  + `Color::Monochrome`
-  + `Color::Red`
-  + `Color::Orange`
-  + `Color::Yellow`
-  + `Color::Green`
-  + `Color::Blue`
-  + `Color::Purple`
-  + `Color::Pink`
+### Hue values
 
-### Possible luminosity values: 
-  + `Luminosity::Random`
-  + `Luminosity::Bright`
-  + `Luminosity::Light`
-  + `Luminosity::Dark`
++ `Color::Monochrome`
++ `Color::Red`
++ `Color::Orange`
++ `Color::Yellow`
++ `Color::Green`
++ `Color::Blue`
++ `Color::Purple`
++ `Color::Pink`
 
-### Possible alpha values:
-  + You can specify a value between 0 and 1 with `.alpha()`
-  + You can specify a random value with `.random_alpha()`
+### Luminosity values
+
++ `Luminosity::Random`
++ `Luminosity::Bright`
++ `Luminosity::Light`
++ `Luminosity::Dark`
+
+### Alpha values
+
++ You can specify a value between 0 and 1 with `.alpha()`
++ You can specify a random value with `.random_alpha()`
   
-### Avaible outputs:
+### Outputs
+
 ```rust
   // As HSV Array
   let color = RandomColor::new().to_hsv_array(); // color => [179, 20, 100]
@@ -67,6 +97,7 @@ let color = RandomColor::new()
   // As Hex String
   let color = RandomColor::new().to_hex(); // color => "#b31464"
 ```
+
 ## Roadmap
 
 + Iteartor
@@ -76,7 +107,7 @@ let color = RandomColor::new()
 
 The MIT License (MIT)
 
-Copyright (c) 2017 <a href="http://lucasmarino.me">Lucas Maximiliano Marino</a>
+Copyright (c) 2017 [Lucas Maximiliano Marino](https://lucasmarino.me)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
