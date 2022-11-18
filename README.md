@@ -100,7 +100,7 @@ let color = RandomColor::new()
 
 ## Roadmap
 
-+ Iteartor
++ Iterator
 + Documentation
 
 ## License
