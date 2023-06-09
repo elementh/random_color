@@ -21,9 +21,10 @@ mod color_dictionary;
 use color_dictionary::{ColorDictionary, ColorInformation};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
-use std::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Color {
     Monochrome,
     Red,
@@ -34,7 +35,8 @@ pub enum Color {
     Purple,
     Pink,
 }
-#[derive(Debug, PartialEq)]
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Luminosity {
     Random,
     Bright,
@@ -42,7 +44,7 @@ pub enum Luminosity {
     Dark,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct RandomColor {
     /// Can take values of `Color` enum.
     pub hue: Option<ColorInformation>,
@@ -53,9 +55,9 @@ pub struct RandomColor {
     /// Can take values `f32` from 0 to 1.
     pub alpha: Option<f32>,
 }
-impl RandomColor {
-    /// Generates a new RandomColor
-    pub fn new() -> RandomColor {
+
+impl Default for RandomColor {
+    fn default() -> Self {
         RandomColor {
             hue: None,
             luminosity: None,
@@ -63,6 +65,14 @@ impl RandomColor {
             alpha: Some(1.0),
         }
     }
+}
+
+impl RandomColor {
+    /// Generates a new RandomColor
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Sets `RandomColor.hue` colorspace.
     pub fn hue(&mut self, hue: Color) -> &mut RandomColor {
         let cd = ColorDictionary::new();
@@ -120,13 +130,12 @@ impl RandomColor {
     }
 
     pub fn to_rgba_string(&self) -> String {
-        let a: f32;
         let (h, s, b) = self.generate_color();
         let rgb = self.hsv_to_rgb(h, s, b);
-        match self.alpha {
-            Some(alpha) => a = alpha,
-            None => a = rand::random(),
-        }
+        let a: f32 = match self.alpha {
+            Some(alpha) => alpha,
+            None => rand::random(),
+        };
 
         format!("rgba({}, {}, {}, {})", rgb[0], rgb[1], rgb[2], a)
     }
@@ -144,13 +153,12 @@ impl RandomColor {
     }
 
     pub fn to_hsla_string(&self) -> String {
-        let a: f32;
         let (h, s, b) = self.generate_color();
         let hsv = self.hsv_to_hsl(h, s, b);
-        match self.alpha {
-            Some(alpha) => a = alpha,
-            None => a = rand::random(),
-        }
+        let a: f32 = match self.alpha {
+            Some(alpha) => alpha,
+            None => rand::random(),
+        };
         format!("hsl({}, {}%, {}%, {})", hsv[0], hsv[1], hsv[2], a)
     }
 
@@ -216,12 +224,12 @@ impl RandomColor {
         }
 
         if min == max {
-            max = max + 1;
+            max += 1;
         }
 
         match self.seed {
-            None => SmallRng::from_entropy().gen_range(min, max),
-            Some(seed) => SmallRng::seed_from_u64(seed as u64).gen_range(min, max),
+            None => SmallRng::from_entropy().gen_range(min..max),
+            Some(seed) => SmallRng::seed_from_u64(seed).gen_range(min..max),
         }
     }
 
@@ -330,16 +338,16 @@ impl Seed for &str {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use color_dictionary::ColorDictionary;
-    use RandomColor;
 
-    use Color;
-    use Luminosity;
     use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hasher, Hash};
+    use std::hash::{Hash, Hasher};
+
+    use crate::color_dictionary::ColorDictionary;
+    use crate::Color;
+    use crate::Luminosity;
+    use crate::RandomColor;
 
     #[test]
     fn accept_values() {
@@ -367,7 +375,7 @@ mod tests {
         let cd = ColorDictionary::new();
 
         let mut hasher = DefaultHasher::new();
-       "New Seed".to_string().hash(&mut hasher);
+        "New Seed".to_string().hash(&mut hasher);
         let hash = hasher.finish();
 
         let test_case = RandomColor {
@@ -376,7 +384,7 @@ mod tests {
             seed: Some(hash),
             alpha: Some(1.0),
         }
-            .to_hsl_string();
+        .to_hsl_string();
 
         let rc = RandomColor::new()
             .hue(Color::Blue)
@@ -398,7 +406,7 @@ mod tests {
             seed: Some(12345u64),
             alpha: Some(1.0),
         }
-            .to_hsl_string();
+        .to_hsl_string();
 
         let rc = RandomColor::new()
             .hue(Color::Blue)
@@ -420,7 +428,7 @@ mod tests {
             seed: Some(12345u64),
             alpha: Some(1.0),
         }
-            .to_hsl_string();
+        .to_hsl_string();
 
         let rc = RandomColor::new()
             .hue(Color::Blue)
@@ -441,7 +449,7 @@ mod tests {
             .alpha(1.0)
             .to_hsv_array();
 
-        assert_eq!(test_case, [189, 40, 91]);
+        assert_eq!(test_case, [191, 30, 94]);
     }
     #[test]
     fn generates_color_as_rgb_string() {
@@ -452,7 +460,7 @@ mod tests {
             .alpha(1.0)
             .to_rgb_string();
 
-        assert_eq!(test_case, "rgb(139, 218, 232)");
+        assert_eq!(test_case, "rgb(167, 226, 239)");
     }
     #[test]
     fn generates_color_as_rgba_string() {
@@ -463,7 +471,7 @@ mod tests {
             .alpha(1.0)
             .to_rgba_string();
 
-        assert_eq!(test_case, "rgba(139, 218, 232, 1)");
+        assert_eq!(test_case, "rgba(167, 226, 239, 1)");
     }
     #[test]
     fn generates_color_as_rgb_array() {
@@ -474,7 +482,7 @@ mod tests {
             .alpha(1.0)
             .to_rgb_array();
 
-        assert_eq!(test_case, [139, 218, 232]);
+        assert_eq!(test_case, [167, 226, 239]);
     }
     #[test]
     fn generates_color_as_hsl_string() {
@@ -485,8 +493,9 @@ mod tests {
             .alpha(1.0)
             .to_hsl_string();
 
-        assert_eq!(test_case, "hsl(189, 66%, 27%)");
+        assert_eq!(test_case, "hsl(191, 70%, 20%)");
     }
+
     #[test]
     fn generates_color_as_hsla_string() {
         let test_case = RandomColor::new()
@@ -496,7 +505,7 @@ mod tests {
             .alpha(1.0)
             .to_hsla_string();
 
-        assert_eq!(test_case, "hsl(189, 66%, 27%, 1)");
+        assert_eq!(test_case, "hsl(191, 70%, 20%, 1)");
     }
     #[test]
     fn generates_color_as_hsl_array() {
@@ -507,7 +516,7 @@ mod tests {
             .alpha(1.0)
             .to_hsl_array();
 
-        assert_eq!(test_case, [189, 66, 27]);
+        assert_eq!(test_case, [191, 70, 20]);
     }
     #[test]
     fn generates_color_as_hex() {
@@ -518,7 +527,7 @@ mod tests {
             .alpha(1.0)
             .to_hex();
 
-        assert_eq!(test_case, "#8bdae8");
+        assert_eq!(test_case, "#a7e2ef");
     }
 
     #[test]
@@ -546,7 +555,6 @@ mod tests {
             .seed(5)
             .to_hex();
 
-        println!("test_case: {}", test_case);
-        assert_eq!(test_case, "#0f0d93");
+        assert_eq!(test_case, "#3e0496");
     }
 }

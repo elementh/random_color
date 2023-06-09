@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ColorInformation {
     pub range: [i64; 2],
     pub lower_bounds: Vec<[i64; 2]>,
@@ -7,8 +7,7 @@ pub struct ColorInformation {
 }
 
 impl ColorInformation {
-    pub fn new(range: [i64; 2], lower_bounds: Vec<[i64; 2]>) -> ColorInformation {
-
+    pub fn new(range: [i64; 2], lower_bounds: Vec<[i64; 2]>) -> Self {
         let saturation_range_min = lower_bounds[0][0];
         let saturation_range_max = lower_bounds[lower_bounds.len() - 1][0];
 
@@ -19,11 +18,11 @@ impl ColorInformation {
 
         let value_range = [value_range_min, value_range_max];
 
-        ColorInformation {
-            range: range,
-            lower_bounds: lower_bounds,
-            saturation_range: saturation_range,
-            value_range: value_range,
+        Self {
+            range,
+            lower_bounds,
+            saturation_range,
+            value_range,
         }
     }
     pub fn has_between_range(&self, hue: &i64) -> bool {
@@ -167,19 +166,19 @@ impl ColorDictionary {
     }
 
     pub fn get_color(self, hue: &i64) -> ColorInformation {
-        if self.monochrome.has_between_range(&hue) {
+        if self.monochrome.has_between_range(hue) {
             self.monochrome
-        } else if self.red.has_between_range(&hue) {
+        } else if self.red.has_between_range(hue) {
             self.red
-        } else if self.orange.has_between_range(&hue) {
+        } else if self.orange.has_between_range(hue) {
             self.orange
-        } else if self.yellow.has_between_range(&hue) {
+        } else if self.yellow.has_between_range(hue) {
             self.yellow
-        } else if self.green.has_between_range(&hue) {
+        } else if self.green.has_between_range(hue) {
             self.green
-        } else if self.blue.has_between_range(&hue) {
+        } else if self.blue.has_between_range(hue) {
             self.blue
-        } else if self.purple.has_between_range(&hue) {
+        } else if self.purple.has_between_range(hue) {
             self.purple
         } else {
             self.pink
