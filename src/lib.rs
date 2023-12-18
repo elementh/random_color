@@ -54,6 +54,8 @@ pub struct RandomColor {
     pub seed: Option<u64>,
     /// Can take values `f32` from 0 to 1.
     pub alpha: Option<f32>,
+    /// Optional, bring your own dictionary
+    pub color_dictionary: Option<ColorDictionary>,
 }
 
 impl Default for RandomColor {
@@ -63,6 +65,7 @@ impl Default for RandomColor {
             luminosity: None,
             seed: None,
             alpha: Some(1.0),
+            color_dictionary: Some(ColorDictionary::new()),
         }
     }
 }
@@ -75,7 +78,10 @@ impl RandomColor {
 
     /// Sets `RandomColor.hue` colorspace.
     pub fn hue(&mut self, hue: Color) -> &mut RandomColor {
-        let cd = ColorDictionary::new();
+        let cd = match &self.color_dictionary {
+            Some(color_dict) => color_dict.clone(),
+            None => ColorDictionary::new(),
+        };
 
         self.hue = match hue {
             Color::Monochrome => Some(cd.monochrome),
@@ -189,7 +195,11 @@ impl RandomColor {
     }
 
     fn pick_saturation(&self, hue: &i64) -> i64 {
-        let cd = ColorDictionary::new();
+        let cd = match &self.color_dictionary {
+            Some(color_dict) => color_dict.clone(),
+            None => ColorDictionary::new(),
+        };
+
         let s_range = cd.get_saturation_range(hue);
 
         let s_min = s_range.0;
@@ -205,7 +215,10 @@ impl RandomColor {
     }
 
     fn pick_brightness(&self, hue: &i64, saturation: &i64) -> i64 {
-        let cd = ColorDictionary::new();
+        let cd = match &self.color_dictionary {
+            Some(color_dict) => color_dict.clone(),
+            None => ColorDictionary::new(),
+        };
 
         let b_min = cd.get_minimum_value(hue, saturation);
         let b_max = 100;
@@ -357,6 +370,7 @@ mod tests {
             luminosity: Some(Luminosity::Light),
             seed: Some(42),
             alpha: Some(1.0),
+            color_dictionary: Some(ColorDictionary::new()),
         }
         .to_hsl_string();
 
@@ -383,6 +397,7 @@ mod tests {
             luminosity: Some(Luminosity::Light),
             seed: Some(hash),
             alpha: Some(1.0),
+            color_dictionary: Some(ColorDictionary::new()),
         }
         .to_hsl_string();
 
@@ -405,6 +420,7 @@ mod tests {
             luminosity: Some(Luminosity::Light),
             seed: Some(12345u64),
             alpha: Some(1.0),
+            color_dictionary: Some(ColorDictionary::new()),
         }
         .to_hsl_string();
 
@@ -427,6 +443,7 @@ mod tests {
             luminosity: Some(Luminosity::Light),
             seed: Some(12345u64),
             alpha: Some(1.0),
+            color_dictionary: Some(ColorDictionary::new()),
         }
         .to_hsl_string();
 
