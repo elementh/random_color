@@ -16,7 +16,7 @@
 
 extern crate rand;
 
-mod color_dictionary;
+pub mod color_dictionary;
 
 use color_dictionary::{ColorDictionary, ColorInformation};
 use rand::rngs::SmallRng;
