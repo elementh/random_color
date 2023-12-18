@@ -2,6 +2,7 @@
 //! Inspired by [RandomColor](https://github.com/davidmerfield/randomColor).
 //! ### Usage
 //! ```rust
+//! use random_color::color_dictionary::{ColorDictionary, ColorInformation};
 //! use random_color::{Color, Luminosity, RandomColor};
 //!
 //! let color = RandomColor::new()
@@ -9,6 +10,7 @@
 //!   .luminosity(Luminosity::Light) // Optional
 //!   .seed(42) // Optional
 //!   .alpha(1.0) // Optional
+//!   .dictionary(ColorDictionary::new())
 //!   .to_hsl_string(); //
 //!
 //! // color => "hsl(179, 99%, 10%)"
