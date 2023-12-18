@@ -1,6 +1,6 @@
 [package]
 name = "random_color"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 authors = ["Lucas Maximiliano Marino <lucasmmarino@gmail.com>"]
 license = "MIT"

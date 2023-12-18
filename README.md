@@ -10,6 +10,12 @@ Inspired by [RandomColor](https://github.com/davidmerfield/randomColor) by [davi
 
 Amazing rust projects using `random_color`:
 
+> [fake-rs](https://github.com/cksac/fake-rs) —
+> a library for generating fake data in Rust
+
+> [news-flash](https://github.com/patchedsoul/news-flash) —
+> a modern feed reader designed for the GNOME desktop
+
 > [cargo-trend](https://github.com/dalance/cargo-trend) —
 > cargo subcommand to generate trend graph of dependent crates
 
@@ -35,6 +41,7 @@ Amazing rust projects using `random_color`:
 Check the online [documentation](https://docs.rs/random_color/latest/random_color/).
 
 ```rust
+use random_color::color_dictionary::{ColorDictionary, ColorInformation};
 use random_color::{Color, Luminosity, RandomColor};
 
 let color = RandomColor::new()
@@ -42,6 +49,7 @@ let color = RandomColor::new()
   .luminosity(Luminosity::Light) // Optional
   .seed(42) // Optional
   .alpha(1.0) // Optional
+  .dictionary(ColorDictionary::new()) //optional
   .to_hsl_string(); // 
 
 // color => "hsl(179, 99%, 10%)"
@@ -101,7 +109,6 @@ let color = RandomColor::new()
 ## Roadmap
 
 + Iteartor
-+ Documentation
 
 ## License
 
