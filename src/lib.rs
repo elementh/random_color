@@ -123,6 +123,11 @@ impl RandomColor {
         self
     }
 
+    pub fn dictionary(&mut self, dictionary: ColorDictionary) -> &mut RandomColor {
+        self.color_dictionary = Some(dictionary);
+        self
+    }
+
     pub fn to_hsv_array(&self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
         [h as u32, s as u32, b as u32]
