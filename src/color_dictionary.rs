@@ -30,6 +30,7 @@ impl ColorInformation {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ColorDictionary {
     pub monochrome: ColorInformation,
     pub red: ColorInformation,
@@ -40,6 +41,7 @@ pub struct ColorDictionary {
     pub purple: ColorInformation,
     pub pink: ColorInformation,
 }
+
 impl ColorDictionary {
     pub fn new() -> ColorDictionary {
         ColorDictionary {
