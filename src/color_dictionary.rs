@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct ColorInformation {
     pub range: [i64; 2],
     pub lower_bounds: Vec<[i64; 2]>,
@@ -30,7 +30,7 @@ impl ColorInformation {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct ColorDictionary {
     pub monochrome: ColorInformation,
     pub red: ColorInformation,

@@ -26,8 +26,9 @@ use rand::{Rng, SeedableRng};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum Color {
+    #[default]
     Monochrome,
     Red,
     Orange,
@@ -38,15 +39,16 @@ pub enum Color {
     Pink,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum Luminosity {
+    #[default]
     Random,
     Bright,
     Light,
     Dark,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct RandomColor {
     /// Can take values of `Color` enum.
     pub hue: Option<ColorInformation>,
