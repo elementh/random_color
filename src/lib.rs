@@ -1,3 +1,41 @@
+//! A library for generating attractive random colors with a variety of options.
+//! Inspired by [randomColor](https://github.com/davidmerfield/randomColor).
+//! 
+//! # Examples
+//! 
+//! ```rust
+//! use random_color::RandomColor;
+//! 
+//! let mut random_color = RandomColor::new();
+//! 
+//! let color = random_color.to_hex();
+//! println!("{}", color);
+//! ```
+//! 
+//! ```rust
+//! use random_color::RandomColor;
+//! use random_color::options::{Gamut, Luminosity};
+//! 
+//! let mut random_color = RandomColor{
+//!     hue: Some(Gamut::Blue),
+//!     luminosity: Some(Luminosity::Dark),
+//!     ..Default::default()
+//! };
+//! 
+//! let color = random_color.to_hsl_string();
+//! println!("{}", color);
+//! ```
+//! 
+//! ```rust
+//! use random_color::RandomColor;
+//! 
+//! let mut random_color = RandomColor::new();
+//! 
+//! random_color.seed("A random seed");
+//! 
+//! let color = random_color.to_rgb_string();
+//! println!("{}", color);
+//! ```
 extern crate rand;
 
 pub mod color_dictionary;
@@ -8,16 +46,35 @@ use options::{Gamut, Luminosity, Seed};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 
+/// A structure for generating random colors with a variety of options.
+///
+/// The available options are:
+/// * `hue`: Specify a specific hue, or a range of hues. You can use the
+///   `Gamut` enum to select a hue.
+/// * `luminosity`: Specify a specific luminosity, or a range of luminosities.
+///   You can use the `Luminosity` enum to select a luminosity.
+/// * `seed`: Specify a seed for the random number generator. If you don't
+///   specify a seed, one will be generated randomly.
+/// * `alpha`: Specify an alpha value for the generated color. If you don't
+///   specify an alpha value, 1.0 will be used.
+/// * `color_dictionary`: Specify a custom color dictionary. If you don't
+///   specify a color dictionary, the default one will be used.
 #[derive(Debug, PartialEq, Clone)]
 pub struct RandomColor {
+    /// The hue of the color to generate.
     pub hue: Option<Gamut>,
+    /// The luminosity of the color to generate.
     pub luminosity: Option<Luminosity>,
+    /// The seed for the random number generator.
     pub seed: SmallRng,
+    /// The alpha value of the color to generate.
     pub alpha: Option<f32>,
+    /// The color dictionary to use.
     pub color_dictionary: ColorDictionary,
 }
 
 impl RandomColor {
+    /// Creates a new `RandomColor` instance.
     pub fn new() -> Self {
         RandomColor {
             hue: None,
@@ -28,23 +85,27 @@ impl RandomColor {
         }
     }
 
+    /// Sets the hue setting.
     pub fn hue(&mut self, hue: Gamut) -> &mut RandomColor {
         self.hue = Some(hue);
 
         self
     }
 
+    /// Removes the luminosity setting.
     pub fn luminosity(&mut self, luminosity: Luminosity) -> &mut RandomColor {
         self.luminosity = Some(luminosity);
         self
     }
 
+    /// Sets the seed.
     pub fn seed<T: Seed>(&mut self, seed: T) -> &mut RandomColor {
         self.seed = SmallRng::seed_from_u64(seed.to_value());
 
         self
     }
 
+    /// Sets the alpha setting.
     pub fn alpha(&mut self, alpha: f32) -> &mut RandomColor {
         if alpha < 1.0 {
             self.alpha = Some(alpha);
@@ -53,23 +114,28 @@ impl RandomColor {
         self
     }
 
+    /// Removes the alpha setting.
     pub fn random_alpha(&mut self) -> &mut RandomColor {
         self.alpha = None;
 
         self
     }
 
+    /// Sets the ColorDictionary.
     pub fn dictionary(&mut self, dictionary: ColorDictionary) -> &mut RandomColor {
         self.color_dictionary = dictionary;
 
         self
     }
 
+    /// Generates a random color and returns it as an HSV array.
     pub fn to_hsv_array(&mut self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
+
         [h as u32, s as u32, b as u32]
     }
 
+    /// Generates a random color and returns it as an RGB string.
     pub fn to_rgb_string(&mut self) -> String {
         let (h, s, b) = self.generate_color();
         let rgb = self.hsv_to_rgb(h, s, b);
@@ -77,6 +143,7 @@ impl RandomColor {
         format!("rgb({}, {}, {})", rgb[0], rgb[1], rgb[2])
     }
 
+    /// Generates a random color and returns it as an RGBA string.
     pub fn to_rgba_string(&mut self) -> String {
         let (h, s, b) = self.generate_color();
         let rgb = self.hsv_to_rgb(h, s, b);
@@ -88,11 +155,14 @@ impl RandomColor {
         format!("rgba({}, {}, {}, {})", rgb[0], rgb[1], rgb[2], a)
     }
 
+    /// Generates a random color and returns it as an RGB array.
     pub fn to_rgb_array(&mut self) -> [u8; 3] {
         let (h, s, b) = self.generate_color();
+
         self.hsv_to_rgb(h, s, b)
     }
 
+    /// Generates a random color and returns it as an HSL string.
     pub fn to_hsl_string(&mut self) -> String {
         let (h, s, b) = self.generate_color();
         let hsv = self.hsv_to_hsl(h, s, b);
@@ -100,6 +170,7 @@ impl RandomColor {
         format!("hsl({}, {}%, {}%)", hsv[0], hsv[1], hsv[2])
     }
 
+    /// Generates a random color and returns it as an HSLA string.
     pub fn to_hsla_string(&mut self) -> String {
         let (h, s, b) = self.generate_color();
         let hsv = self.hsv_to_hsl(h, s, b);
@@ -107,20 +178,26 @@ impl RandomColor {
             Some(alpha) => alpha,
             None => rand::random(),
         };
+
         format!("hsl({}, {}%, {}%, {})", hsv[0], hsv[1], hsv[2], a)
     }
 
+    /// Generates a random color and returns it as an HSL array.
     pub fn to_hsl_array(&mut self) -> [u32; 3] {
         let (h, s, b) = self.generate_color();
 
         self.hsv_to_hsl(h, s, b)
     }
+
+    /// Generates a random color and returns it as a hex string.
     pub fn to_hex(&mut self) -> String {
         let (h, s, b) = self.generate_color();
         let [r, g, b] = self.hsv_to_rgb(h, s, b);
+
         format!("#{:02x}{:02x}{:02x}", r, g, b)
     }
 
+    /// Generates a random color based on the settings.
     fn generate_color(&mut self) -> (i64, i64, i64) {
         let h = self.pick_hue();
         let s = self.pick_saturation(&h);
@@ -129,15 +206,21 @@ impl RandomColor {
         (h, s, b)
     }
 
+    /// Picks a random hue based on the hue setting.
     fn pick_hue(&mut self) -> i64 {
         match self.hue {
             None => self.random_within(0, 361),
             Some(ref gamut) => {
                 let color = self.color_dictionary.get_color_from_gamut(gamut);
                 self.random_within(color.range[0], color.range[1])
-            }        }
+            }
+        }
     }
 
+    /// Picks a random saturation value based on the hue and luminosity setting.
+    ///
+    /// Parameters:
+    /// * `hue`: The hue of the color.
     fn pick_saturation(&mut self, hue: &i64) -> i64 {
         let s_range: (i64, i64) = self.color_dictionary.get_saturation_range(hue);
 
@@ -153,6 +236,12 @@ impl RandomColor {
         }
     }
 
+    /// Picks a random brightness value based on the hue and saturation, as well
+    /// as the luminosity setting.
+    ///
+    /// Parameters:
+    /// * `hue`: The hue of the color.
+    /// * `saturation`: The saturation of the color.
     fn pick_brightness(&mut self, hue: &i64, saturation: &i64) -> i64 {
         let b_min = self.color_dictionary.get_minimum_value(hue, saturation);
         let b_max = 100;
@@ -165,6 +254,16 @@ impl RandomColor {
         }
     }
 
+    /// Generates a random i64 within the given range.
+    ///
+    /// This function first ensures that `min` is less than or equal to `max`.
+    /// If `min` is equal to `max`, it increments `max` by 1 to ensure that the
+    /// range is not empty. It uses the `SmallRng` in the seed property to
+    /// generate the random number.
+    ///
+    /// Parameters:
+    /// * `min`: The minimum value of the range.
+    /// * `max`: The maximum value of the range.
     fn random_within(&mut self, mut min: i64, mut max: i64) -> i64 {
         if min > max {
             std::mem::swap(&mut min, &mut max);
@@ -177,6 +276,12 @@ impl RandomColor {
         self.seed.gen_range(min..max)
     }
 
+    /// Convert a color from HSV to RGB.
+    ///
+    /// Parameters:
+    /// * `hue`: The hue of the color in the range [0, 360).
+    /// * `saturation`: The saturation of the color in the range [0, 100].
+    /// * `brightness`: The brightness of the color in the range [0, 100].
     fn hsv_to_rgb(&self, mut hue: i64, saturation: i64, brightness: i64) -> [u8; 3] {
         if hue == 0 {
             hue = 1;
@@ -212,6 +317,12 @@ impl RandomColor {
         ]
     }
 
+    /// Convert a color from HSV to HSL.
+    ///
+    /// Parameters:
+    /// * `hue`: The hue of the color in the range [0, 360).
+    /// * `saturation`: The saturation of the color in the range [0, 100].
+    /// * `brightness`: The brightness of the color in the range [0, 100].
     fn hsv_to_hsl(&self, hue: i64, saturation: i64, brightness: i64) -> [u32; 3] {
         let h = hue;
         let s = saturation as f32 / 100.0;

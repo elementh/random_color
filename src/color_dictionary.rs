@@ -1,14 +1,20 @@
 use crate::options::Gamut;
 
+/// Color information for a given hue.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ColorInformation {
+    /// The range of the hue.
     pub range: [i64; 2],
+    /// The lower bounds of the hue.
     pub lower_bounds: Vec<[i64; 2]>,
+    /// The saturation range of the hue.
     pub saturation_range: [i64; 2],
+    /// The value range of the hue.
     pub value_range: [i64; 2],
 }
 
 impl ColorInformation {
+    /// Create a new `ColorInformation` instance.
     pub fn new(range: [i64; 2], lower_bounds: Vec<[i64; 2]>) -> Self {
         let saturation_range_min = lower_bounds[0][0];
         let saturation_range_max = lower_bounds[lower_bounds.len() - 1][0];
@@ -27,24 +33,36 @@ impl ColorInformation {
             value_range,
         }
     }
+
+    /// Check if the given hue is within the range.
     pub fn has_between_range(&self, hue: &i64) -> bool {
         hue >= &self.range[0] && hue <= &self.range[1]
     }
 }
 
+/// The color dictionary contains all the color information for the different gamuts.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ColorDictionary {
+    /// The color information for the monochrome gamut.
     pub monochrome: ColorInformation,
+    /// The color information for the red gamut.
     pub red: ColorInformation,
+    /// The color information for the orange gamut.
     pub orange: ColorInformation,
+    /// The color information for the yellow gamut.
     pub yellow: ColorInformation,
+    /// The color information for the green gamut.
     pub green: ColorInformation,
+    /// The color information for the blue gamut.
     pub blue: ColorInformation,
+    /// The color information for the purple gamut.
     pub purple: ColorInformation,
+    /// The color information for the pink gamut.
     pub pink: ColorInformation,
 }
 
 impl ColorDictionary {
+    /// Creates a new `ColorDictionary` instance.
     pub fn new() -> ColorDictionary {
         ColorDictionary {
             monochrome: ColorInformation::new([0, 0], vec![[0, 0], [100, 0]]),
@@ -143,11 +161,20 @@ impl ColorDictionary {
         }
     }
 
+    /// Get the saturation range for the given hue.
+    ///
+    /// Parameters:
+    /// * `hue`: The hue to get the saturation range for.
     pub fn get_saturation_range(&self, hue: &i64) -> (i64, i64) {
         let color = &self.get_color_from_hue(hue);
         (color.saturation_range[0], color.saturation_range[1])
     }
 
+    /// Get the minimum value for the given hue and saturation.
+    ///
+    /// Parameters:
+    /// * `hue`: The hue to get the minimum value for.
+    /// * `saturation`: The saturation to get the minimum value for.
     pub fn get_minimum_value(&self, hue: &i64, saturation: &i64) -> i64 {
         let mut minimum_value = 0;
         let lower_bounds = &self.get_color_from_hue(hue).lower_bounds;
@@ -169,6 +196,27 @@ impl ColorDictionary {
         minimum_value
     }
 
+    /// Get the color information for the given gamut.
+    ///
+    /// Parameters:
+    /// * `gamut`: The gamut to get the color information for.
+    pub fn get_color_from_gamut(&self, gamut: &Gamut) -> &ColorInformation {
+        match gamut {
+            Gamut::Monochrome => &self.monochrome,
+            Gamut::Red => &self.red,
+            Gamut::Orange => &self.orange,
+            Gamut::Yellow => &self.yellow,
+            Gamut::Green => &self.green,
+            Gamut::Blue => &self.blue,
+            Gamut::Purple => &self.purple,
+            Gamut::Pink => &self.pink,
+        }
+    }
+
+    /// Get the color information for the given hue.
+    ///
+    /// Parameters:
+    /// * `hue`: The hue to get the color information for.
     fn get_color_from_hue(&self, hue: &i64) -> &ColorInformation {
         if self.monochrome.has_between_range(hue) {
             &self.monochrome
@@ -186,19 +234,6 @@ impl ColorDictionary {
             &self.purple
         } else {
             &self.pink
-        }
-    }
-
-    pub fn get_color_from_gamut(&self, gamut: &Gamut) -> &ColorInformation {
-        match gamut {
-            Gamut::Monochrome => &self.monochrome,
-            Gamut::Red => &self.red,
-            Gamut::Orange => &self.orange,
-            Gamut::Yellow => &self.yellow,
-            Gamut::Green => &self.green,
-            Gamut::Blue => &self.blue,
-            Gamut::Purple => &self.purple,
-            Gamut::Pink => &self.pink,
         }
     }
 }
