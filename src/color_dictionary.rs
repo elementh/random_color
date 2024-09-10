@@ -143,12 +143,12 @@ impl ColorDictionary {
         }
     }
 
-    pub fn get_saturation_range(self, hue: &i64) -> (i64, i64) {
+    pub fn get_saturation_range(&self, hue: &i64) -> (i64, i64) {
         let color = &self.get_color_from_hue(hue);
         (color.saturation_range[0], color.saturation_range[1])
     }
 
-    pub fn get_minimum_value(self, hue: &i64, saturation: &i64) -> i64 {
+    pub fn get_minimum_value(&self, hue: &i64, saturation: &i64) -> i64 {
         let mut minimum_value = 0;
         let lower_bounds = &self.get_color_from_hue(hue).lower_bounds;
         for i in 0..lower_bounds.len() - 1 {

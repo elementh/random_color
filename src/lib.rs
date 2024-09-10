@@ -14,7 +14,7 @@ pub struct RandomColor {
     pub luminosity: Option<Luminosity>,
     pub seed: SmallRng,
     pub alpha: Option<f32>,
-    pub color_dictionary: Option<ColorDictionary>,
+    pub color_dictionary: ColorDictionary,
 }
 
 impl RandomColor {
@@ -24,16 +24,13 @@ impl RandomColor {
             luminosity: None,
             seed: SmallRng::from_entropy(),
             alpha: Some(1.0),
-            color_dictionary: Some(ColorDictionary::new()),
+            color_dictionary: ColorDictionary::new(),
         }
     }
 
     pub fn hue(&mut self, hue: Gamut) -> &mut RandomColor {
-        let cd = match &self.color_dictionary {
-            Some(color_dict) => color_dict.clone(),
-            None => ColorDictionary::new(),
-        };
-
+        let cd = self.color_dictionary.clone();
+        
         self.hue = match hue {
             Gamut::Monochrome => Some(cd.monochrome),
             Gamut::Red => Some(cd.red),
@@ -63,16 +60,19 @@ impl RandomColor {
         if alpha < 1.0 {
             self.alpha = Some(alpha);
         }
+
         self
     }
 
     pub fn random_alpha(&mut self) -> &mut RandomColor {
         self.alpha = None;
+
         self
     }
 
     pub fn dictionary(&mut self, dictionary: ColorDictionary) -> &mut RandomColor {
-        self.color_dictionary = Some(dictionary);
+        self.color_dictionary = dictionary;
+
         self
     }
 
@@ -148,12 +148,7 @@ impl RandomColor {
     }
 
     fn pick_saturation(&mut self, hue: &i64) -> i64 {
-        let cd = match &self.color_dictionary {
-            Some(color_dict) => color_dict.clone(),
-            None => ColorDictionary::new(),
-        };
-
-        let s_range = cd.get_saturation_range(hue);
+        let s_range = self.color_dictionary.get_saturation_range(hue);
 
         let s_min = s_range.0;
         let s_max = s_range.1;
@@ -168,12 +163,7 @@ impl RandomColor {
     }
 
     fn pick_brightness(&mut self, hue: &i64, saturation: &i64) -> i64 {
-        let cd = match &self.color_dictionary {
-            Some(color_dict) => color_dict.clone(),
-            None => ColorDictionary::new(),
-        };
-
-        let b_min = cd.get_minimum_value(hue, saturation);
+        let b_min = self.color_dictionary.get_minimum_value(hue, saturation);
         let b_max = 100;
 
         match self.luminosity {
