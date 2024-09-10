@@ -4,10 +4,10 @@
 //! ```rust
 //! use random_color::color_dictionary::{ColorDictionary, ColorInformation};
 //! use random_color::RandomColor;
-//! use random_color::options::{Color, Luminosity};
+//! use random_color::options::{Gamut, Luminosity};
 //!
 //! let color = RandomColor::new()
-//!   .hue(Color::Blue) // Optional
+//!   .hue(Gamut::Blue) // Optional
 //!   .luminosity(Luminosity::Light) // Optional
 //!   .seed(42) // Optional
 //!   .alpha(1.0) // Optional
