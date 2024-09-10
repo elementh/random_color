@@ -3,8 +3,8 @@
 //! ### Usage
 //! ```rust
 //! use random_color::color_dictionary::{ColorDictionary, ColorInformation};
-//! use random_color::{Luminosity, RandomColor};
-//! use random_color::options::Color;
+//! use random_color::RandomColor;
+//! use random_color::options::{Color, Luminosity};
 //!
 //! let color = RandomColor::new()
 //!   .hue(Color::Blue) // Optional
@@ -23,21 +23,11 @@ pub mod color_dictionary;
 pub mod options;
 
 use color_dictionary::{ColorDictionary, ColorInformation};
-use options::Color;
+use options::{Color, Luminosity};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-
-
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Luminosity {
-    Random,
-    Bright,
-    Light,
-    Dark,
-}
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RandomColor {
