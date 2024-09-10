@@ -202,3 +202,9 @@ impl ColorDictionary {
         }
     }
 }
+
+impl Default for ColorDictionary {
+    fn default() -> Self {
+        ColorDictionary::new()
+    }
+}
