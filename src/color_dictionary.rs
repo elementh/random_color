@@ -142,13 +142,13 @@ impl ColorDictionary {
     }
 
     pub fn get_saturation_range(self, hue: &i64) -> (i64, i64) {
-        let color = self.get_color(hue);
+        let color = &self.get_color_from_hue(hue);
         (color.saturation_range[0], color.saturation_range[1])
     }
 
     pub fn get_minimum_value(self, hue: &i64, saturation: &i64) -> i64 {
         let mut minimum_value = 0;
-        let lower_bounds = self.get_color(hue).lower_bounds;
+        let lower_bounds = &self.get_color_from_hue(hue).lower_bounds;
         for i in 0..lower_bounds.len() - 1 {
             let s1 = lower_bounds[i][0];
             let v1 = lower_bounds[i][1];
@@ -167,23 +167,23 @@ impl ColorDictionary {
         minimum_value
     }
 
-    pub fn get_color(self, hue: &i64) -> ColorInformation {
+    fn get_color_from_hue(&self, hue: &i64) -> &ColorInformation {
         if self.monochrome.has_between_range(hue) {
-            self.monochrome
+            &self.monochrome
         } else if self.red.has_between_range(hue) {
-            self.red
+            &self.red
         } else if self.orange.has_between_range(hue) {
-            self.orange
+            &self.orange
         } else if self.yellow.has_between_range(hue) {
-            self.yellow
+            &self.yellow
         } else if self.green.has_between_range(hue) {
-            self.green
+            &self.green
         } else if self.blue.has_between_range(hue) {
-            self.blue
+            &self.blue
         } else if self.purple.has_between_range(hue) {
-            self.purple
+            &self.purple
         } else {
-            self.pink
+            &self.pink
         }
     }
 }
