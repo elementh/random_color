@@ -3,14 +3,14 @@ extern crate rand;
 pub mod color_dictionary;
 pub mod options;
 
-use color_dictionary::{ColorDictionary, ColorInformation};
+use color_dictionary::ColorDictionary;
 use options::{Gamut, Luminosity, Seed};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RandomColor {
-    pub hue: Option<ColorInformation>,
+    pub hue: Option<Gamut>,
     pub luminosity: Option<Luminosity>,
     pub seed: SmallRng,
     pub alpha: Option<f32>,
@@ -29,18 +29,7 @@ impl RandomColor {
     }
 
     pub fn hue(&mut self, hue: Gamut) -> &mut RandomColor {
-        let cd = self.color_dictionary.clone();
-        
-        self.hue = match hue {
-            Gamut::Monochrome => Some(cd.monochrome),
-            Gamut::Red => Some(cd.red),
-            Gamut::Orange => Some(cd.orange),
-            Gamut::Yellow => Some(cd.yellow),
-            Gamut::Green => Some(cd.green),
-            Gamut::Blue => Some(cd.blue),
-            Gamut::Purple => Some(cd.purple),
-            Gamut::Pink => Some(cd.pink),
-        };
+        self.hue = Some(hue);
 
         self
     }
@@ -143,12 +132,14 @@ impl RandomColor {
     fn pick_hue(&mut self) -> i64 {
         match self.hue {
             None => self.random_within(0, 361),
-            Some(ref color) => self.random_within(color.range[0], color.range[1]),
-        }
+            Some(ref gamut) => {
+                let color = self.color_dictionary.get_color_from_gamut(gamut);
+                self.random_within(color.range[0], color.range[1])
+            }        }
     }
 
     fn pick_saturation(&mut self, hue: &i64) -> i64 {
-        let s_range = self.color_dictionary.get_saturation_range(hue);
+        let s_range: (i64, i64) = self.color_dictionary.get_saturation_range(hue);
 
         let s_min = s_range.0;
         let s_max = s_range.1;
