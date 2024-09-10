@@ -1,6 +1,7 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+/// A trait for types that can be used as seeds for the RandomColor struct.
 pub trait Seed {
     fn to_value(self) -> u64;
 }

@@ -1,5 +1,7 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// The gamut (hue) of the color.
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Gamut {
+    #[default]
     Monochrome,
     Red,
     Orange,

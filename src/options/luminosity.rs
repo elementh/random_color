@@ -1,6 +1,7 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// The luminosity of the color.
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Luminosity {
-    Random,
+    #[default] Random,
     Bright,
     Light,
     Dark,
