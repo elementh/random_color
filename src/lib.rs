@@ -23,7 +23,7 @@ pub mod color_dictionary;
 pub mod options;
 
 use color_dictionary::{ColorDictionary, ColorInformation};
-use options::{Color, Luminosity, Seed};
+use options::{Gamut, Luminosity, Seed};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 
@@ -60,21 +60,21 @@ impl RandomColor {
     }
 
     /// Sets `RandomColor.hue` colorspace.
-    pub fn hue(&mut self, hue: Color) -> &mut RandomColor {
+    pub fn hue(&mut self, hue: Gamut) -> &mut RandomColor {
         let cd = match &self.color_dictionary {
             Some(color_dict) => color_dict.clone(),
             None => ColorDictionary::new(),
         };
 
         self.hue = match hue {
-            Color::Monochrome => Some(cd.monochrome),
-            Color::Red => Some(cd.red),
-            Color::Orange => Some(cd.orange),
-            Color::Yellow => Some(cd.yellow),
-            Color::Green => Some(cd.green),
-            Color::Blue => Some(cd.blue),
-            Color::Purple => Some(cd.purple),
-            Color::Pink => Some(cd.pink),
+            Gamut::Monochrome => Some(cd.monochrome),
+            Gamut::Red => Some(cd.red),
+            Gamut::Orange => Some(cd.orange),
+            Gamut::Yellow => Some(cd.yellow),
+            Gamut::Green => Some(cd.green),
+            Gamut::Blue => Some(cd.blue),
+            Gamut::Purple => Some(cd.purple),
+            Gamut::Pink => Some(cd.pink),
         };
 
         self
@@ -294,7 +294,7 @@ mod tests {
     use std::hash::{Hash, Hasher};
 
     use crate::color_dictionary::ColorDictionary;
-    use crate::Color;
+    use crate::Gamut;
     use crate::Luminosity;
     use crate::RandomColor;
 
@@ -311,7 +311,7 @@ mod tests {
         .to_hsl_string();
 
         let rc = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -338,7 +338,7 @@ mod tests {
         .to_hsl_string();
 
         let rc = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed("New Seed".to_string())
             .alpha(1.0)
@@ -361,7 +361,7 @@ mod tests {
         .to_hsl_string();
 
         let rc = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(12345u64)
             .alpha(1.0)
@@ -384,7 +384,7 @@ mod tests {
         .to_hsl_string();
 
         let rc = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(12345i64)
             .alpha(1.0)
@@ -396,7 +396,7 @@ mod tests {
     #[test]
     fn generates_color_as_hsv_array() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -407,7 +407,7 @@ mod tests {
     #[test]
     fn generates_color_as_rgb_string() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -418,7 +418,7 @@ mod tests {
     #[test]
     fn generates_color_as_rgba_string() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -429,7 +429,7 @@ mod tests {
     #[test]
     fn generates_color_as_rgb_array() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -440,7 +440,7 @@ mod tests {
     #[test]
     fn generates_color_as_hsl_string() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -452,7 +452,7 @@ mod tests {
     #[test]
     fn generates_color_as_hsla_string() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -463,7 +463,7 @@ mod tests {
     #[test]
     fn generates_color_as_hsl_array() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -474,7 +474,7 @@ mod tests {
     #[test]
     fn generates_color_as_hex() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
@@ -486,13 +486,13 @@ mod tests {
     #[test]
     fn to_hex_is_rrggbb() {
         let test_case = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
             .to_hex();
         let [r, g, b] = RandomColor::new()
-            .hue(Color::Blue)
+            .hue(Gamut::Blue)
             .luminosity(Luminosity::Light)
             .seed(42)
             .alpha(1.0)
