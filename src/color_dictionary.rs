@@ -1,3 +1,5 @@
+use crate::options::Gamut;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ColorInformation {
     pub range: [i64; 2],
@@ -184,6 +186,19 @@ impl ColorDictionary {
             &self.purple
         } else {
             &self.pink
+        }
+    }
+
+    pub fn get_color_from_gamut(&self, gamut: &Gamut) -> &ColorInformation {
+        match gamut {
+            Gamut::Monochrome => &self.monochrome,
+            Gamut::Red => &self.red,
+            Gamut::Orange => &self.orange,
+            Gamut::Yellow => &self.yellow,
+            Gamut::Green => &self.green,
+            Gamut::Blue => &self.blue,
+            Gamut::Purple => &self.purple,
+            Gamut::Pink => &self.pink,
         }
     }
 }
