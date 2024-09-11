@@ -37,6 +37,8 @@
 //! println!("{}", color);
 //! ```
 extern crate rand;
+#[cfg(feature = "rgb_support")]
+extern crate rgb;
 
 pub mod color_dictionary;
 pub mod options;
@@ -45,6 +47,8 @@ use color_dictionary::ColorDictionary;
 use options::{Gamut, Luminosity, Seed};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
+#[cfg(feature = "rgb_support")]
+use rgb::{Rgb, Rgba};
 
 /// A structure for generating random colors with a variety of options.
 ///
@@ -339,6 +343,34 @@ impl RandomColor {
             (k / 2.0 * 100.0) as u32,
         ]
     }
+
+    /* Optional Features */
+
+    /* `rgb crate support` */
+
+    /// Generates a random color and returns it as an `Rgb` struct from the `rgb` crate.
+    #[cfg(feature = "rgb_support")]
+    pub fn to_rgb(&mut self) -> Rgb<u8> {
+        let rgb = self.to_rgb_array();
+
+        Rgb { r: rgb[0], g: rgb[1], b: rgb[2] }
+    }
+
+    /// Generates a random color and returns it as an `Rgba` struct from the `rgb` crate.
+    #[cfg(feature = "rgb_support")]
+    pub fn to_rgba(&mut self) -> Rgba<u8> {
+        let rgb = self.to_rgb_array();
+
+        let alpha = match self.alpha {
+            Some(alpha) => (alpha * 255.0) as u8,
+            None => self.random_within(0, 255) as u8,
+            
+        };
+
+        Rgba { r: rgb[0], g: rgb[1], b: rgb[2], a: alpha }
+    }
+
+
 }
 
 impl Default for RandomColor {
@@ -369,6 +401,7 @@ mod tests {
 
         assert_eq!(test_case, [191, 30, 98]);
     }
+    
     #[test]
     fn generates_color_as_rgb_string() {
         let test_case = RandomColor::new()
@@ -380,6 +413,7 @@ mod tests {
 
         assert_eq!(test_case, "rgb(174, 236, 249)");
     }
+    
     #[test]
     fn generates_color_as_rgba_string() {
         let test_case = RandomColor::new()
@@ -391,6 +425,7 @@ mod tests {
 
         assert_eq!(test_case, "rgba(174, 236, 249, 1)");
     }
+    
     #[test]
     fn generates_color_as_rgb_array() {
         let test_case = RandomColor::new()
@@ -402,6 +437,7 @@ mod tests {
 
         assert_eq!(test_case, [174, 236, 249]);
     }
+    
     #[test]
     fn generates_color_as_hsl_string() {
         let test_case = RandomColor::new()
@@ -425,6 +461,7 @@ mod tests {
 
         assert_eq!(test_case, "hsl(191, 88%, 16%, 1)");
     }
+    
     #[test]
     fn generates_color_as_hsl_array() {
         let test_case = RandomColor::new()
@@ -436,6 +473,7 @@ mod tests {
 
         assert_eq!(test_case, [191, 88, 16]);
     }
+    
     #[test]
     fn generates_color_as_hex() {
         let test_case = RandomColor::new()
@@ -474,5 +512,33 @@ mod tests {
             .to_hex();
 
         assert_eq!(test_case, "#3e0496");
+    }
+
+    /* Optional Feature Tests */
+
+    #[test]
+    #[cfg(feature = "rgb_support")]
+    fn generates_color_as_rgb_from_rgb_crate() {
+        let test_case = RandomColor::new()
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0)
+            .to_rgb();
+
+        assert_eq!(test_case, Rgb::new(174, 236, 249));
+    }
+
+    #[test]
+    #[cfg(feature = "rgb_support")]
+    fn generates_color_as_rgba_from_rgb_crate() {
+        let test_case = RandomColor::new()
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(0.69)
+            .to_rgba();
+
+        assert_eq!(test_case, Rgba::new(174, 236, 249, 175));
     }
 }

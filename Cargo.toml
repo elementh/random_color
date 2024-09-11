@@ -11,6 +11,14 @@ homepage ="https://github.com/elementh/random_color"
 description = "Rust crate for generating random attractive colors"
 
 [features]
+rgb_support = ["dep:rgb"]
+palette_support = []
+ecolor_support = []
 
 [dependencies]
 rand = { version = "0.8.5", features = ["small_rng"] }
+rgb = { version = "0.8.50", optional = true}
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
