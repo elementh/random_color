@@ -256,16 +256,6 @@ impl RandomColor {
         format!("#{:02x}{:02x}{:02x}", r, g, b)
     }
 
-    /// Transforms the `RandomColor` into a `f32` array with the color's RGB values.
-    pub fn into_f32_rgb_array(self) -> [f32; 3] {
-        self.clone().to_f32_rgb_array()
-    }
-
-    /// Transforms the `RandomColor` into a `f32` array with the color's RGBA values.
-    pub fn into_f32_rgba_array(self) -> [f32; 4] {
-        self.clone().to_f32_rgba_array()
-    }
-
     /// Transforms the `RandomColor` into a `u8` array with the color's RGB values.
     pub fn into_rgb_array(self) -> [u8; 3] {
         self.clone().to_rgb_array()
@@ -274,6 +264,16 @@ impl RandomColor {
     /// Transforms the `RandomColor` into a `u8` array with the color's RGBA values.
     pub fn into_rgba_array(self) -> [u8; 4] {
         self.clone().to_rgba_array()
+    }
+
+    /// Transforms the `RandomColor` into a `f32` array with the color's RGB values.
+    pub fn into_f32_rgb_array(self) -> [f32; 3] {
+        self.clone().to_f32_rgb_array()
+    }
+
+    /// Transforms the `RandomColor` into a `f32` array with the color's RGBA values.
+    pub fn into_f32_rgba_array(self) -> [f32; 4] {
+        self.clone().to_f32_rgba_array()
     }
 
     /// Generates a random color based on the settings.
