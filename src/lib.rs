@@ -36,6 +36,8 @@
 //! let color = random_color.to_rgb_string();
 //! println!("{}", color);
 //! ```
+#[cfg(feature = "ecolor_support")]
+extern crate ecolor;
 #[cfg(feature = "palette_support")]
 extern crate palette;
 extern crate rand;
@@ -46,6 +48,7 @@ pub mod color_dictionary;
 pub mod options;
 
 use color_dictionary::ColorDictionary;
+use ecolor::{Color32, Rgba};
 use options::{Gamut, Luminosity, Seed};
 #[cfg(feature = "palette_support")]
 use palette::{Srgb, Srgba};
@@ -170,21 +173,40 @@ impl RandomColor {
         self.hsv_to_rgb(h, s, b)
     }
 
+    /// Generates a random color and returns it as an RGB array.
+    pub fn to_rgba_array(&mut self) -> [u8; 4] {
+        let (h, s, b) = self.generate_color();
+        let rgb: [u8; 3] = self.hsv_to_rgb(h, s, b);
+
+        [
+            rgb[0],
+            rgb[1],
+            rgb[2],
+            (self.alpha.unwrap_or(1.0) * 255.0).round() as u8,
+        ]
+    }
+
     /// Generates a random color and returns it as a `f32` RGB array.
     pub fn to_f32_rgb_array(&mut self) -> [f32; 3] {
         let (h, s, b) = self.generate_color();
+        let rgb: [u8; 3] = self.hsv_to_rgb(h, s, b);
 
-        [h as f32 / 255.0, s as f32 / 255.0, b as f32 / 255.0]
+        [
+            rgb[0] as f32 / 255.0,
+            rgb[1] as f32 / 255.0,
+            rgb[2] as f32 / 255.0,
+        ]
     }
 
     /// Generates a random color and returns it as an `f32` RGBA array.
     pub fn to_f32_rgba_array(&mut self) -> [f32; 4] {
         let (h, s, b) = self.generate_color();
+        let rgb: [u8; 3] = self.hsv_to_rgb(h, s, b);
 
         [
-            h as f32 / 255.0,
-            s as f32 / 255.0,
-            b as f32 / 255.0,
+            rgb[0] as f32 / 255.0,
+            rgb[1] as f32 / 255.0,
+            rgb[2] as f32 / 255.0,
             self.alpha.unwrap_or(1.0),
         ]
     }
@@ -222,6 +244,26 @@ impl RandomColor {
         let [r, g, b] = self.hsv_to_rgb(h, s, b);
 
         format!("#{:02x}{:02x}{:02x}", r, g, b)
+    }
+
+    /// Transforms the `RandomColor` into a `f32` array with the color's RGB values.
+    pub fn into_f32_rgb_array(self) -> [f32; 3] {
+        self.clone().to_f32_rgb_array()
+    }
+
+    /// Transforms the `RandomColor` into a `f32` array with the color's RGBA values.
+    pub fn into_f32_rgba_array(self) -> [f32; 4] {
+        self.clone().to_f32_rgba_array()
+    }
+
+    /// Transforms the `RandomColor` into a `u8` array with the color's RGB values.
+    pub fn into_rgb_array(self) -> [u8; 3] {
+        self.clone().to_rgb_array()
+    }
+
+    /// Transforms the `RandomColor` into a `u8` array with the color's RGBA values.
+    pub fn into_rgba_array(self) -> [u8; 4] {
+        self.clone().to_rgba_array()
     }
 
     /// Generates a random color based on the settings.
@@ -400,20 +442,6 @@ impl RandomColor {
             a: alpha,
         }
     }
-
-    /* `palette` crate support */
-
-    /// Transforms the `RandomColor` into a `f32` array with the color's RGB values.
-    #[cfg(feature = "palette_support")]
-    pub fn into_f32_rgb_array(self) -> [f32; 3] {
-        self.clone().to_f32_rgb_array()
-    }
-
-    /// Transforms the `RandomColor` into a `f32` array with the color's RGBA values.
-    #[cfg(feature = "palette_support")]
-    pub fn into_f32_rgba_array(self) -> [f32; 4] {
-        self.clone().to_f32_rgba_array()
-    }
 }
 
 impl Default for RandomColor {
@@ -455,6 +483,38 @@ impl From<&mut RandomColor> for Srgb {
         let rgb = value.to_f32_rgb_array();
 
         Srgb::new(rgb[0], rgb[1], rgb[2])
+    }
+}
+
+#[cfg(feature = "ecolor_support")]
+impl From<RandomColor> for Color32 {
+    fn from(value: RandomColor) -> Self {
+        let rgba = value.into_rgba_array();
+        Color32::from_rgba_unmultiplied(rgba[0], rgba[1], rgba[2], rgba[3])
+    }
+}
+
+#[cfg(feature = "ecolor_support")]
+impl From<&mut RandomColor> for Color32 {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgba = value.to_rgba_array();
+        Color32::from_rgba_unmultiplied(rgba[0], rgba[1], rgba[2], rgba[3])
+    }
+}
+
+#[cfg(feature = "ecolor_support")]
+impl From<RandomColor> for Rgba {
+    fn from(value: RandomColor) -> Self {
+        let rgba = value.into_f32_rgba_array();
+        Rgba::from_rgba_unmultiplied(rgba[0], rgba[1], rgba[2], rgba[3])
+    }
+}
+
+#[cfg(feature = "ecolor_support")]
+impl From<&mut RandomColor> for Rgba {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgba = value.to_f32_rgba_array();
+        Rgba::from_rgba_unmultiplied(rgba[0], rgba[1], rgba[2], rgba[3])
     }
 }
 

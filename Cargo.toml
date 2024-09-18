@@ -13,12 +13,13 @@ description = "Rust crate for generating random attractive colors"
 [features]
 rgb_support = ["dep:rgb"]
 palette_support = ["dep:palette"]
-ecolor_support = []
+ecolor_support = ["dep:ecolor"]
 
 [dependencies]
 rand = { version = "0.8.5", features = ["small_rng"] }
 rgb = { version = "0.8.50", optional = true}
 palette = { version = "0.7.6", optional = true}
+ecolor = { version = "0.28.1", optional = true}
 
 [package.metadata.docs.rs]
 all-features = true
