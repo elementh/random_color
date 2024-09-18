@@ -1,50 +1,62 @@
 //! A library for generating attractive random colors with a variety of options.
 //! Inspired by [randomColor](https://github.com/davidmerfield/randomColor).
-//! 
+//!
 //! # Examples
-//! 
+//!
 //! ```rust
 //! use random_color::RandomColor;
-//! 
+//!
 //! let mut random_color = RandomColor::new();
-//! 
+//!
 //! let color = random_color.to_hex();
 //! println!("{}", color);
 //! ```
-//! 
+//!
 //! ```rust
 //! use random_color::RandomColor;
 //! use random_color::options::{Gamut, Luminosity};
-//! 
+//!
 //! let mut random_color = RandomColor{
 //!     hue: Some(Gamut::Blue),
 //!     luminosity: Some(Luminosity::Dark),
 //!     ..Default::default()
 //! };
-//! 
+//!
 //! let color = random_color.to_hsl_string();
 //! println!("{}", color);
 //! ```
-//! 
+//!
 //! ```rust
 //! use random_color::RandomColor;
-//! 
+//!
 //! let mut random_color = RandomColor::new();
-//! 
+//!
 //! random_color.seed("A random seed");
-//! 
+//!
 //! let color = random_color.to_rgb_string();
 //! println!("{}", color);
 //! ```
+#[cfg(feature = "ecolor_support")]
+extern crate ecolor;
+#[cfg(feature = "palette_support")]
+extern crate palette;
 extern crate rand;
+#[cfg(feature = "rgb_support")]
+extern crate rgb;
 
 pub mod color_dictionary;
 pub mod options;
 
 use color_dictionary::ColorDictionary;
+#[cfg(feature = "ecolor_support")]
+use ecolor::{Color32, Rgba};
 use options::{Gamut, Luminosity, Seed};
+#[cfg(feature = "palette_support")]
+use palette::{Srgb, Srgba};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
+#[cfg(feature = "rgb_support")]
+use rgb::Rgb;
 
 /// A structure for generating random colors with a variety of options.
 ///
@@ -149,7 +161,7 @@ impl RandomColor {
         let rgb = self.hsv_to_rgb(h, s, b);
         let a: f32 = match self.alpha {
             Some(alpha) => alpha,
-            None => rand::random(),
+            None => self.seed.gen_range(0.0..1.0),
         };
 
         format!("rgba({}, {}, {}, {})", rgb[0], rgb[1], rgb[2], a)
@@ -160,6 +172,49 @@ impl RandomColor {
         let (h, s, b) = self.generate_color();
 
         self.hsv_to_rgb(h, s, b)
+    }
+
+    /// Generates a random color and returns it as an RGB array.
+    pub fn to_rgba_array(&mut self) -> [u8; 4] {
+        let (h, s, b) = self.generate_color();
+        let rgb: [u8; 3] = self.hsv_to_rgb(h, s, b);
+
+        let alpha = match self.alpha {
+            Some(alpha) => (alpha * 255.0) as u8,
+            None => self.random_within(0, 255) as u8,
+        };
+
+        [rgb[0], rgb[1], rgb[2], alpha]
+    }
+
+    /// Generates a random color and returns it as a `f32` RGB array.
+    pub fn to_f32_rgb_array(&mut self) -> [f32; 3] {
+        let (h, s, b) = self.generate_color();
+        let rgb: [u8; 3] = self.hsv_to_rgb(h, s, b);
+
+        [
+            rgb[0] as f32 / 255.0,
+            rgb[1] as f32 / 255.0,
+            rgb[2] as f32 / 255.0,
+        ]
+    }
+
+    /// Generates a random color and returns it as an `f32` RGBA array.
+    pub fn to_f32_rgba_array(&mut self) -> [f32; 4] {
+        let (h, s, b) = self.generate_color();
+        let rgb: [u8; 3] = self.hsv_to_rgb(h, s, b);
+
+        let alpha: f32 = match self.alpha {
+            Some(alpha) => alpha,
+            None => self.seed.gen_range(0.0..1.0),
+        };
+
+        [
+            rgb[0] as f32 / 255.0,
+            rgb[1] as f32 / 255.0,
+            rgb[2] as f32 / 255.0,
+            alpha,
+        ]
     }
 
     /// Generates a random color and returns it as an HSL string.
@@ -195,6 +250,26 @@ impl RandomColor {
         let [r, g, b] = self.hsv_to_rgb(h, s, b);
 
         format!("#{:02x}{:02x}{:02x}", r, g, b)
+    }
+
+    /// Transforms the `RandomColor` into a `u8` array with the color's RGB values.
+    pub fn into_rgb_array(self) -> [u8; 3] {
+        self.clone().to_rgb_array()
+    }
+
+    /// Transforms the `RandomColor` into a `u8` array with the color's RGBA values.
+    pub fn into_rgba_array(self) -> [u8; 4] {
+        self.clone().to_rgba_array()
+    }
+
+    /// Transforms the `RandomColor` into a `f32` array with the color's RGB values.
+    pub fn into_f32_rgb_array(self) -> [f32; 3] {
+        self.clone().to_f32_rgb_array()
+    }
+
+    /// Transforms the `RandomColor` into a `f32` array with the color's RGBA values.
+    pub fn into_f32_rgba_array(self) -> [f32; 4] {
+        self.clone().to_f32_rgba_array()
     }
 
     /// Generates a random color based on the settings.
@@ -339,11 +414,171 @@ impl RandomColor {
             (k / 2.0 * 100.0) as u32,
         ]
     }
+
+    /* Optional Features */
+
+    /* `rgb` crate support */
+
+    /// Generates a random color and returns it as an `Rgb` struct from the `rgb` crate.
+    #[cfg(feature = "rgb_support")]
+    pub fn to_rgb(&mut self) -> Rgb<u8> {
+        Rgb::from(self)
+    }
+
+    /// Generates a random color and returns it as an `Rgba` struct from the `rgb` crate.
+    #[cfg(feature = "rgb_support")]
+    pub fn to_rgba(&mut self) -> rgb::Rgba<u8> {
+        rgb::Rgba::from(self)
+    }
+
+    /* `palette` crate support */
+
+    /// Generates a random color and returns it as an `Srgb` struct from the `palette` crate.
+    #[cfg(feature = "palette_support")]
+    pub fn to_srgb(&mut self) -> Srgb {
+        Srgb::from(self)
+    }
+
+    /// Generates a random color and returns it as an `Srgba` struct from the `palette` crate.
+    #[cfg(feature = "palette_support")]
+    pub fn to_srgba(&mut self) -> Srgba {
+        Srgba::from(self)
+    }
+
+    /* `ecolor` crate support` */
+
+    /// Generates a random color and returns it as an `Color32` struct from the `ecolor` crate.
+    #[cfg(feature = "ecolor_support")]
+    pub fn to_color32(&mut self) -> Color32 {
+        Color32::from(self)
+    }
 }
 
 impl Default for RandomColor {
     fn default() -> Self {
         RandomColor::new()
+    }
+}
+
+#[cfg(feature = "rgb_support")]
+impl From<RandomColor> for Rgb<u8> {
+    fn from(value: RandomColor) -> Self {
+        let rgb = value.into_rgb_array();
+
+        Rgb {
+            r: rgb[0],
+            g: rgb[1],
+            b: rgb[2],
+        }
+    }
+}
+
+#[cfg(feature = "rgb_support")]
+impl From<&mut RandomColor> for Rgb<u8> {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgb = value.to_rgb_array();
+
+        Rgb {
+            r: rgb[0],
+            g: rgb[1],
+            b: rgb[2],
+        }
+    }
+}
+
+#[cfg(feature = "rgb_support")]
+impl From<RandomColor> for rgb::Rgba<u8> {
+    fn from(value: RandomColor) -> Self {
+        let rgba = value.into_rgba_array();
+
+        rgb::Rgba {
+            r: rgba[0],
+            g: rgba[1],
+            b: rgba[2],
+            a: rgba[3],
+        }
+    }
+}
+
+#[cfg(feature = "rgb_support")]
+impl From<&mut RandomColor> for rgb::Rgba<u8> {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgba = value.to_rgba_array();
+
+        rgb::Rgba {
+            r: rgba[0],
+            g: rgba[1],
+            b: rgba[2],
+            a: rgba[3],
+        }
+    }
+}
+
+#[cfg(feature = "palette_support")]
+impl From<RandomColor> for Srgb {
+    fn from(value: RandomColor) -> Self {
+        let rgb = value.into_f32_rgb_array();
+
+        Srgb::new(rgb[0], rgb[1], rgb[2])
+    }
+}
+
+#[cfg(feature = "palette_support")]
+impl From<&mut RandomColor> for Srgb {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgb = value.to_f32_rgb_array();
+
+        Srgb::new(rgb[0], rgb[1], rgb[2])
+    }
+}
+
+#[cfg(feature = "palette_support")]
+impl From<RandomColor> for Srgba {
+    fn from(value: RandomColor) -> Self {
+        let rgba = value.into_f32_rgba_array();
+
+        Srgba::new(rgba[0], rgba[1], rgba[2], rgba[3])
+    }
+}
+
+#[cfg(feature = "palette_support")]
+impl From<&mut RandomColor> for Srgba {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgba = value.to_f32_rgba_array();
+
+        Srgba::new(rgba[0], rgba[1], rgba[2], rgba[3])
+    }
+}
+
+#[cfg(feature = "ecolor_support")]
+impl From<RandomColor> for Color32 {
+    fn from(value: RandomColor) -> Self {
+        let rgba = value.into_rgba_array();
+        Color32::from_rgba_unmultiplied(rgba[0], rgba[1], rgba[2], rgba[3])
+    }
+}
+
+#[cfg(feature = "ecolor_support")]
+impl From<&mut RandomColor> for Color32 {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgba = value.to_rgba_array();
+        Color32::from_rgba_unmultiplied(rgba[0], rgba[1], rgba[2], rgba[3])
+    }
+}
+
+#[cfg(feature = "ecolor_support")]
+impl From<RandomColor> for Rgba {
+    fn from(value: RandomColor) -> Self {
+        let rgba = value.into_f32_rgba_array();
+        Rgba::from_rgba_unmultiplied(rgba[0], rgba[1], rgba[2], rgba[3])
+    }
+}
+
+#[cfg(feature = "ecolor_support")]
+impl From<&mut RandomColor> for Rgba {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgba = value.to_f32_rgba_array();
+        Rgba::from_rgba_unmultiplied(rgba[0], rgba[1], rgba[2], rgba[3])
     }
 }
 
@@ -369,6 +604,7 @@ mod tests {
 
         assert_eq!(test_case, [191, 30, 98]);
     }
+
     #[test]
     fn generates_color_as_rgb_string() {
         let test_case = RandomColor::new()
@@ -380,6 +616,7 @@ mod tests {
 
         assert_eq!(test_case, "rgb(174, 236, 249)");
     }
+
     #[test]
     fn generates_color_as_rgba_string() {
         let test_case = RandomColor::new()
@@ -391,6 +628,7 @@ mod tests {
 
         assert_eq!(test_case, "rgba(174, 236, 249, 1)");
     }
+
     #[test]
     fn generates_color_as_rgb_array() {
         let test_case = RandomColor::new()
@@ -402,6 +640,31 @@ mod tests {
 
         assert_eq!(test_case, [174, 236, 249]);
     }
+
+    #[test]
+    fn generates_color_as_f32_rgb_array() {
+        let test_case = RandomColor::new()
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0)
+            .to_f32_rgb_array();
+
+        assert_eq!(test_case, [0.68235296, 0.9254902, 0.9764706]);
+    }
+
+    #[test]
+    fn generates_color_as_f32_rgba_array() {
+        let test_case = RandomColor::new()
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0)
+            .to_f32_rgba_array();
+
+        assert_eq!(test_case, [0.68235296, 0.9254902, 0.9764706, 1.0]);
+    }
+
     #[test]
     fn generates_color_as_hsl_string() {
         let test_case = RandomColor::new()
@@ -425,6 +688,7 @@ mod tests {
 
         assert_eq!(test_case, "hsl(191, 88%, 16%, 1)");
     }
+
     #[test]
     fn generates_color_as_hsl_array() {
         let test_case = RandomColor::new()
@@ -436,6 +700,7 @@ mod tests {
 
         assert_eq!(test_case, [191, 88, 16]);
     }
+
     #[test]
     fn generates_color_as_hex() {
         let test_case = RandomColor::new()
@@ -474,5 +739,106 @@ mod tests {
             .to_hex();
 
         assert_eq!(test_case, "#3e0496");
+    }
+
+    /* Optional Feature Tests */
+
+    #[test]
+    #[cfg(feature = "rgb_support")]
+    fn generates_color_as_rgb_from_rgb_crate() {
+        let test_case = RandomColor::new()
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0)
+            .to_rgb();
+
+        assert_eq!(test_case, Rgb::new(174, 236, 249));
+    }
+
+    #[test]
+    #[cfg(feature = "rgb_support")]
+    fn generates_color_as_rgba_from_rgb_crate() {
+        let test_case = RandomColor::new()
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(0.69)
+            .to_rgba();
+
+        assert_eq!(test_case, rgb::Rgba::new(174, 236, 249, 175));
+    }
+
+    #[test]
+    #[cfg(feature = "palette_support")]
+    fn can_be_transformed_into_srgba_from_palette_crate() {
+        let mut rc = RandomColor::new();
+
+        let test_case = rc
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0);
+
+        let converted = Srgba::from(test_case);
+
+        assert_eq!(
+            converted.into_components(),
+            (0.68235296, 0.9254902, 0.9764706, 1.0)
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "palette_support")]
+    fn can_be_transformed_into_srgb_from_palette_crate() {
+        let mut rc = RandomColor::new();
+
+        let test_case = rc
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0);
+
+        let converted = Srgb::from(test_case);
+
+        assert_eq!(
+            converted.into_components(),
+            (0.68235296, 0.9254902, 0.9764706)
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "ecolor_support")]
+    fn can_be_transformed_into_color32_from_ecolor_crate() {
+        let mut rc = RandomColor::new();
+
+        let test_case = rc
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0);
+
+        let converted = Color32::from(test_case);
+
+        assert_eq!(converted.to_array(), [174, 236, 249, 255]);
+    }
+
+    #[test]
+    #[cfg(feature = "ecolor_support")]
+    fn can_be_transformed_into_rgba_from_ecolor_crate() {
+        let mut rc = RandomColor::new();
+
+        let test_case = rc
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0);
+
+        let converted = Rgba::from(test_case);
+
+        assert_eq!(
+            converted.to_array(),
+            [0.68235296, 0.9254902, 0.9764706, 1.0]
+        );
     }
 }
