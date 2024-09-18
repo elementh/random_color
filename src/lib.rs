@@ -160,7 +160,7 @@ impl RandomColor {
         let rgb = self.hsv_to_rgb(h, s, b);
         let a: f32 = match self.alpha {
             Some(alpha) => alpha,
-            None => rand::random(),
+            None => self.seed.gen_range(0.0..1.0),
         };
 
         format!("rgba({}, {}, {}, {})", rgb[0], rgb[1], rgb[2], a)
@@ -178,11 +178,16 @@ impl RandomColor {
         let (h, s, b) = self.generate_color();
         let rgb: [u8; 3] = self.hsv_to_rgb(h, s, b);
 
+        let alpha = match self.alpha {
+            Some(alpha) => (alpha * 255.0) as u8,
+            None => self.random_within(0, 255) as u8,
+        };
+
         [
             rgb[0],
             rgb[1],
             rgb[2],
-            (self.alpha.unwrap_or(1.0) * 255.0).round() as u8,
+            alpha,
         ]
     }
 
@@ -203,11 +208,16 @@ impl RandomColor {
         let (h, s, b) = self.generate_color();
         let rgb: [u8; 3] = self.hsv_to_rgb(h, s, b);
 
+        let alpha: f32 = match self.alpha {
+            Some(alpha) => alpha,
+            None => self.seed.gen_range(0.0..1.0),
+        };
+
         [
             rgb[0] as f32 / 255.0,
             rgb[1] as f32 / 255.0,
             rgb[2] as f32 / 255.0,
-            self.alpha.unwrap_or(1.0),
+            alpha,
         ]
     }
 
