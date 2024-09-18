@@ -55,7 +55,7 @@ use palette::{Srgb, Srgba};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 #[cfg(feature = "rgb_support")]
-use rgb::{Rgb, Rgba};
+use rgb::Rgb;
 
 /// A structure for generating random colors with a variety of options.
 ///
@@ -427,7 +427,7 @@ impl RandomColor {
 
     /// Generates a random color and returns it as an `Rgba` struct from the `rgb` crate.
     #[cfg(feature = "rgb_support")]
-    pub fn to_rgba(&mut self) -> Rgba<u8> {
+    pub fn to_rgba(&mut self) -> rgb::Rgba<u8> {
         let rgb = self.to_rgb_array();
 
         let alpha = match self.alpha {
@@ -435,7 +435,7 @@ impl RandomColor {
             None => self.random_within(0, 255) as u8,
         };
 
-        Rgba {
+        rgb::Rgba {
             r: rgb[0],
             g: rgb[1],
             b: rgb[2],
@@ -586,7 +586,7 @@ mod tests {
             .alpha(1.0)
             .to_f32_rgb_array();
 
-        assert_eq!(test_case, [0.7490196, 0.11764706, 0.38431373]);
+        assert_eq!(test_case, [0.68235296, 0.9254902, 0.9764706]);
     }
 
     #[test]
@@ -598,7 +598,7 @@ mod tests {
             .alpha(1.0)
             .to_f32_rgba_array();
 
-        assert_eq!(test_case, [0.7490196, 0.11764706, 0.38431373, 1.0]);
+        assert_eq!(test_case, [0.68235296, 0.9254902, 0.9764706, 1.0]);
     }
 
     #[test]
@@ -702,7 +702,7 @@ mod tests {
             .alpha(0.69)
             .to_rgba();
 
-        assert_eq!(test_case, Rgba::new(174, 236, 249, 175));
+        assert_eq!(test_case, rgb::Rgba::new(174, 236, 249, 175));
     }
 
     #[test]
@@ -720,7 +720,7 @@ mod tests {
 
         assert_eq!(
             converted.into_components(),
-            (0.7490196, 0.11764706, 0.38431373, 1.0)
+            (0.68235296, 0.9254902, 0.9764706, 1.0)
         );
     }
 
@@ -739,7 +739,39 @@ mod tests {
 
         assert_eq!(
             converted.into_components(),
-            (0.7490196, 0.11764706, 0.38431373)
+            (0.68235296, 0.9254902, 0.9764706)
         );
+    }
+
+    #[test]
+    #[cfg(feature = "ecolor_support")]
+    fn can_be_transformed_into_color32_from_ecolor_crate() {
+        let mut rc = RandomColor::new();
+
+        let test_case = rc
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0);
+
+        let converted = Color32::from(test_case);
+
+        assert_eq!(converted.to_array(), [174, 236, 249, 255]);
+    }
+
+    #[test]
+    #[cfg(feature = "ecolor_support")]
+    fn can_be_transformed_into_rgba_from_ecolor_crate() {
+        let mut rc = RandomColor::new();
+
+        let test_case = rc
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0);
+
+        let converted = Rgba::from(test_case);
+
+        assert_eq!(converted.to_array(), [0.68235296, 0.9254902, 0.9764706, 1.0]);
     }
 }
