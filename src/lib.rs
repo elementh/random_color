@@ -166,6 +166,20 @@ impl RandomColor {
         self.hsv_to_rgb(h, s, b)
     }
 
+    /// Generates a random color and returns it as a `f32` RGB array.
+    pub fn to_f32_rgb_array(&mut self) -> [f32; 3] {
+        let (h, s, b) = self.generate_color();
+
+        [h as f32 / 255.0, s as f32 / 255.0, b as f32 / 255.0]
+    }
+
+    /// Generates a random color and returns it as an `f32` RGBA array.
+    pub fn to_f32_rgba_array(&mut self) -> [f32; 4] {
+        let (h, s, b) = self.generate_color();
+
+        [h as f32 / 255.0, s as f32 / 255.0, b as f32 / 255.0, self.alpha.unwrap_or(1.0)]
+    }
+
     /// Generates a random color and returns it as an HSL string.
     pub fn to_hsl_string(&mut self) -> String {
         let (h, s, b) = self.generate_color();
@@ -436,6 +450,30 @@ mod tests {
             .to_rgb_array();
 
         assert_eq!(test_case, [174, 236, 249]);
+    }
+
+    #[test]
+    fn generates_color_as_f32_rgb_array() {
+        let test_case = RandomColor::new()
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0)
+            .to_f32_rgb_array();
+
+        assert_eq!(test_case, [0.7490196, 0.11764706, 0.38431373]);
+    }
+
+    #[test]
+    fn generates_color_as_f32_rgba_array() {
+        let test_case = RandomColor::new()
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0)
+            .to_f32_rgba_array();
+
+        assert_eq!(test_case, [0.7490196, 0.11764706, 0.38431373, 1.0]);
     }
     
     #[test]
