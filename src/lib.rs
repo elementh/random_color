@@ -39,12 +39,18 @@
 extern crate rand;
 #[cfg(feature = "rgb_support")]
 extern crate rgb;
+#[cfg(feature = "palette_support")]
+extern crate palette;
 
 pub mod color_dictionary;
 pub mod options;
 
+#[cfg(feature = "palette_support")]
+use palette::{Srgb, Srgba};
 use color_dictionary::ColorDictionary;
 use options::{Gamut, Luminosity, Seed};
+#[cfg(feature = "palette_support")]
+use palette::{Srgb, Srgba};
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 #[cfg(feature = "rgb_support")]
@@ -360,7 +366,7 @@ impl RandomColor {
 
     /* Optional Features */
 
-    /* `rgb crate support` */
+    /* `rgb` crate support */
 
     /// Generates a random color and returns it as an `Rgb` struct from the `rgb` crate.
     #[cfg(feature = "rgb_support")]
@@ -384,12 +390,61 @@ impl RandomColor {
         Rgba { r: rgb[0], g: rgb[1], b: rgb[2], a: alpha }
     }
 
+    /* `palette` crate support */
 
+    
+    /// Transforms the `RandomColor` into a `f32` array with the color's RGB values.
+    #[cfg(feature = "palette_support")]
+    pub fn into_f32_rgb_array(self) -> [f32; 3] {
+        self.clone().to_f32_rgb_array()
+    }
+
+    /// Transforms the `RandomColor` into a `f32` array with the color's RGBA values.
+    #[cfg(feature = "palette_support")]
+    pub fn into_f32_rgba_array(self) -> [f32; 4] {
+        self.clone().to_f32_rgba_array()
+    }
 }
 
 impl Default for RandomColor {
     fn default() -> Self {
         RandomColor::new()
+    }
+}
+
+#[cfg(feature = "palette_support")]
+impl From<RandomColor> for Srgba {
+    fn from(value: RandomColor) -> Self {
+        let rgb = value.into_f32_rgba_array();
+
+        Srgba::new(rgb[0], rgb[1], rgb[2], rgb[3])
+    }
+}
+
+#[cfg(feature = "palette_support")]
+impl From<&mut RandomColor> for Srgba {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgb = value.to_f32_rgba_array();
+
+        Srgba::new(rgb[0], rgb[1], rgb[2], rgb[3])
+    }
+}
+
+#[cfg(feature = "palette_support")]
+impl From<RandomColor> for Srgb {
+    fn from(value: RandomColor) -> Self {
+        let rgb = value.into_f32_rgb_array();
+
+        Srgb::new(rgb[0], rgb[1], rgb[2])
+    }
+}
+
+#[cfg(feature = "palette_support")]
+impl From<&mut RandomColor> for Srgb {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgb = value.to_f32_rgb_array();
+
+        Srgb::new(rgb[0], rgb[1], rgb[2])
     }
 }
 
@@ -578,5 +633,37 @@ mod tests {
             .to_rgba();
 
         assert_eq!(test_case, Rgba::new(174, 236, 249, 175));
+    }
+
+    #[test]
+    #[cfg(feature = "palette_support")]
+    fn can_be_transformed_into_srgba_from_palette_crate() {
+        let mut rc = RandomColor::new();
+
+        let test_case = rc
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0);
+
+        let converted = Srgba::from(test_case);
+
+        assert_eq!(converted.into_components(), (0.7490196, 0.11764706, 0.38431373, 1.0));
+    }
+
+    #[test]
+    #[cfg(feature = "palette_support")]
+    fn can_be_transformed_into_srgb_from_palette_crate() {
+        let mut rc = RandomColor::new();
+
+        let test_case = rc
+            .hue(Gamut::Blue)
+            .luminosity(Luminosity::Light)
+            .seed(42)
+            .alpha(1.0);
+
+        let converted = Srgb::from(test_case);
+
+        assert_eq!(converted.into_components(), (0.7490196, 0.11764706, 0.38431373));
     }
 }
