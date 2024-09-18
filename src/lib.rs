@@ -426,7 +426,26 @@ impl RandomColor {
     /// Generates a random color and returns it as an `Rgb` struct from the `rgb` crate.
     #[cfg(feature = "rgb_support")]
     pub fn to_rgb(&mut self) -> Rgb<u8> {
-        let rgb = self.to_rgb_array();
+        Rgb::from(self)
+    }
+
+    /// Generates a random color and returns it as an `Rgba` struct from the `rgb` crate.
+    #[cfg(feature = "rgb_support")]
+    pub fn to_rgba(&mut self) -> rgb::Rgba<u8> {
+        rgb::Rgba::from(self)
+    }
+}
+
+impl Default for RandomColor {
+    fn default() -> Self {
+        RandomColor::new()
+    }
+}
+
+#[cfg(feature = "rgb_support")]
+impl From<RandomColor> for Rgb<u8> {
+    fn from(value: RandomColor) -> Self {
+        let rgb = value.into_rgb_array();
 
         Rgb {
             r: rgb[0],
@@ -434,29 +453,46 @@ impl RandomColor {
             b: rgb[2],
         }
     }
+}
 
-    /// Generates a random color and returns it as an `Rgba` struct from the `rgb` crate.
-    #[cfg(feature = "rgb_support")]
-    pub fn to_rgba(&mut self) -> rgb::Rgba<u8> {
-        let rgb = self.to_rgb_array();
+#[cfg(feature = "rgb_support")]
+impl From<&mut RandomColor> for Rgb<u8> {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgb = value.to_rgb_array();
 
-        let alpha = match self.alpha {
-            Some(alpha) => (alpha * 255.0) as u8,
-            None => self.random_within(0, 255) as u8,
-        };
-
-        rgb::Rgba {
+        Rgb {
             r: rgb[0],
             g: rgb[1],
             b: rgb[2],
-            a: alpha,
         }
     }
 }
 
-impl Default for RandomColor {
-    fn default() -> Self {
-        RandomColor::new()
+#[cfg(feature = "rgb_support")]
+impl From<RandomColor> for rgb::Rgba<u8> {
+    fn from(value: RandomColor) -> Self {
+        let rgba = value.into_rgba_array();
+
+        rgb::Rgba {
+            r: rgba[0],
+            g: rgba[1],
+            b: rgba[2],
+            a: rgba[3],
+        }
+    }
+}
+
+#[cfg(feature = "rgb_support")]
+impl From<&mut RandomColor> for rgb::Rgba<u8> {
+    fn from(value: &mut RandomColor) -> Self {
+        let rgba = value.to_rgba_array();
+
+        rgb::Rgba {
+            r: rgba[0],
+            g: rgba[1],
+            b: rgba[2],
+            a: rgba[3],
+        }
     }
 }
 
