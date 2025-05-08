@@ -91,7 +91,7 @@ impl RandomColor {
         RandomColor {
             hue: None,
             luminosity: None,
-            seed: SmallRng::from_entropy(),
+            seed: SmallRng::from_os_rng(),
             alpha: Some(1.0),
             color_dictionary: ColorDictionary::new(),
         }
@@ -161,7 +161,7 @@ impl RandomColor {
         let rgb = self.hsv_to_rgb(h, s, b);
         let a: f32 = match self.alpha {
             Some(alpha) => alpha,
-            None => self.seed.gen_range(0.0..1.0),
+            None => self.seed.random_range(0.0..1.0),
         };
 
         format!("rgba({}, {}, {}, {})", rgb[0], rgb[1], rgb[2], a)
@@ -206,7 +206,7 @@ impl RandomColor {
 
         let alpha: f32 = match self.alpha {
             Some(alpha) => alpha,
-            None => self.seed.gen_range(0.0..1.0),
+            None => self.seed.random_range(0.0..1.0),
         };
 
         [
@@ -348,7 +348,7 @@ impl RandomColor {
             max += 1;
         }
 
-        self.seed.gen_range(min..max)
+        self.seed.random_range(min..max)
     }
 
     /// Convert a color from HSV to RGB.
@@ -602,7 +602,7 @@ mod tests {
             .alpha(1.0)
             .to_hsv_array();
 
-        assert_eq!(test_case, [191, 30, 98]);
+        assert_eq!(test_case, [242, 31, 99]);
     }
 
     #[test]
@@ -614,7 +614,7 @@ mod tests {
             .alpha(1.0)
             .to_rgb_string();
 
-        assert_eq!(test_case, "rgb(174, 236, 249)");
+        assert_eq!(test_case, "rgb(176, 174, 252)");
     }
 
     #[test]
@@ -626,7 +626,7 @@ mod tests {
             .alpha(1.0)
             .to_rgba_string();
 
-        assert_eq!(test_case, "rgba(174, 236, 249, 1)");
+        assert_eq!(test_case, "rgba(176, 174, 252, 1)");
     }
 
     #[test]
@@ -638,7 +638,7 @@ mod tests {
             .alpha(1.0)
             .to_rgb_array();
 
-        assert_eq!(test_case, [174, 236, 249]);
+        assert_eq!(test_case, [176, 174, 252]);
     }
 
     #[test]
@@ -650,7 +650,7 @@ mod tests {
             .alpha(1.0)
             .to_f32_rgb_array();
 
-        assert_eq!(test_case, [0.68235296, 0.9254902, 0.9764706]);
+        assert_eq!(test_case, [0.6901961, 0.68235296, 0.9882353]);
     }
 
     #[test]
@@ -662,7 +662,7 @@ mod tests {
             .alpha(1.0)
             .to_f32_rgba_array();
 
-        assert_eq!(test_case, [0.68235296, 0.9254902, 0.9764706, 1.0]);
+        assert_eq!(test_case, [0.6901961, 0.68235296, 0.9882353, 1.0]);
     }
 
     #[test]
@@ -674,7 +674,7 @@ mod tests {
             .alpha(1.0)
             .to_hsl_string();
 
-        assert_eq!(test_case, "hsl(191, 88%, 16%)");
+        assert_eq!(test_case, "hsl(242, 93%, 16%)");
     }
 
     #[test]
@@ -686,7 +686,7 @@ mod tests {
             .alpha(1.0)
             .to_hsla_string();
 
-        assert_eq!(test_case, "hsl(191, 88%, 16%, 1)");
+        assert_eq!(test_case, "hsl(242, 93%, 16%, 1)");
     }
 
     #[test]
@@ -698,7 +698,7 @@ mod tests {
             .alpha(1.0)
             .to_hsl_array();
 
-        assert_eq!(test_case, [191, 88, 16]);
+        assert_eq!(test_case, [242, 93, 16]);
     }
 
     #[test]
@@ -710,7 +710,7 @@ mod tests {
             .alpha(1.0)
             .to_hex();
 
-        assert_eq!(test_case, "#aeecf9");
+        assert_eq!(test_case, "#b0aefc");
     }
 
     #[test]
@@ -738,7 +738,7 @@ mod tests {
             .seed(5)
             .to_hex();
 
-        assert_eq!(test_case, "#3e0496");
+        assert_eq!(test_case, "#207204");
     }
 
     /* Optional Feature Tests */
@@ -753,7 +753,7 @@ mod tests {
             .alpha(1.0)
             .to_rgb();
 
-        assert_eq!(test_case, Rgb::new(174, 236, 249));
+        assert_eq!(test_case, Rgb::new(176, 174, 252));
     }
 
     #[test]
@@ -766,7 +766,7 @@ mod tests {
             .alpha(0.69)
             .to_rgba();
 
-        assert_eq!(test_case, rgb::Rgba::new(174, 236, 249, 175));
+        assert_eq!(test_case, rgb::Rgba::new(176, 174, 252, 175));
     }
 
     #[test]
@@ -784,7 +784,7 @@ mod tests {
 
         assert_eq!(
             converted.into_components(),
-            (0.68235296, 0.9254902, 0.9764706, 1.0)
+            (0.6901961, 0.68235296, 0.9882353, 1.0)
         );
     }
 
@@ -803,7 +803,7 @@ mod tests {
 
         assert_eq!(
             converted.into_components(),
-            (0.68235296, 0.9254902, 0.9764706)
+            (0.6901961, 0.68235296, 0.9882353)
         );
     }
 
@@ -820,7 +820,7 @@ mod tests {
 
         let converted = Color32::from(test_case);
 
-        assert_eq!(converted.to_array(), [174, 236, 249, 255]);
+        assert_eq!(converted.to_array(), [176, 174, 252, 255]);
     }
 
     #[test]
@@ -838,7 +838,7 @@ mod tests {
 
         assert_eq!(
             converted.to_array(),
-            [0.68235296, 0.9254902, 0.9764706, 1.0]
+            [0.6901961, 0.68235296, 0.9882353, 1.0]
         );
     }
 }
