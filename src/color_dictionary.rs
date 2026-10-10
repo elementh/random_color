@@ -186,10 +186,7 @@ impl ColorDictionary {
             let v2 = lower_bounds[i + 1][1];
 
             if saturation >= &s1 && saturation <= &s2 {
-                let m = (v2 - v1) / (s2 - s1);
-                let b = v1 - m * s1;
-
-                minimum_value = m * saturation + b;
+                minimum_value = v1 + ((v2 - v1) * (saturation - s1)).div_euclid(s2 - s1);
             }
         }
 
@@ -218,9 +215,13 @@ impl ColorDictionary {
     /// Parameters:
     /// * `hue`: The hue to get the color information for.
     fn get_color_from_hue(&self, hue: &i64) -> &ColorInformation {
-        if self.monochrome.has_between_range(hue) {
-            &self.monochrome
-        } else if self.red.has_between_range(hue) {
+        let hue = &if (334..=360).contains(hue) {
+            hue - 360
+        } else {
+            *hue
+        };
+
+        if self.red.has_between_range(hue) {
             &self.red
         } else if self.orange.has_between_range(hue) {
             &self.orange
@@ -241,5 +242,34 @@ impl ColorDictionary {
 impl Default for ColorDictionary {
     fn default() -> Self {
         ColorDictionary::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn minimum_value_interpolates_between_lower_bounds() {
+        let dictionary = ColorDictionary::new();
+
+        assert_eq!(dictionary.get_minimum_value(&200, &30), 86);
+        assert_eq!(dictionary.get_minimum_value(&200, &31), 85);
+        assert_eq!(dictionary.get_minimum_value(&200, &35), 83);
+        assert_eq!(dictionary.get_minimum_value(&200, &40), 80);
+    }
+
+    #[test]
+    fn hues_near_360_and_0_use_red() {
+        let dictionary = ColorDictionary::new();
+
+        for hue in [0, 10, 334, 340, 360] {
+            assert_eq!(
+                dictionary.get_color_from_hue(&hue),
+                &dictionary.red,
+                "hue {hue}"
+            );
+        }
+        assert_eq!(dictionary.get_color_from_hue(&333), &dictionary.pink);
     }
 }

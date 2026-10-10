@@ -7,3 +7,7 @@ pub enum Luminosity {
     Light,
     Dark,
 }
+
+impl Luminosity {
+    pub const ALL: [Self; 4] = [Self::Random, Self::Bright, Self::Light, Self::Dark];
+}

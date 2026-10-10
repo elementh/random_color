@@ -1,8 +1,11 @@
 [package]
 name = "random_color"
-version = "1.1.0"
-edition = "2021"
-authors = ["Lucas Maximiliano Marino <lucasmmarino@gmail.com>"]
+version = "2.0.0"
+edition = "2024"
+authors = [
+	"Lucas Maximiliano Marino <lucasmmarino@gmail.com>",
+	"Yaroslav Bolyukin <iam@lach.pw>",
+]
 license = "MIT"
 readme = "README.md"
 keywords = ["random", "color", "rgb", "rgba", "hsl"]
@@ -16,10 +19,13 @@ palette_support = ["dep:palette"]
 ecolor_support = ["dep:ecolor"]
 
 [dependencies]
-rand = { version = "0.9", features = ["small_rng"] }
+rand = { version = "0.10", default-features = false }
 rgb = { version = "0.8.50", optional = true }
 palette = { version = "0.7.6", optional = true }
-ecolor = { version = "0.31", optional = true }
+ecolor = { version = "0.36", optional = true }
+
+[dev-dependencies]
+rand = { version = "0.10", features = ["thread_rng"] }
 
 [package.metadata.docs.rs]
 all-features = true
